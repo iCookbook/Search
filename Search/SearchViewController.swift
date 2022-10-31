@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Resources
 
 final class SearchViewController: UIViewController {
     
@@ -31,7 +32,8 @@ final class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        title = Texts.Search.title
+        view.backgroundColor = Colors.systemBackground
     }
 }
 

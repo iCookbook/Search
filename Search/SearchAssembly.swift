@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Networking
 
 public final class SearchAssembly {
     
@@ -47,8 +48,10 @@ public final class SearchAssembly {
 
 public struct SearchContext {
     weak var moduleOutput: SearchModuleOutput?
+    let moduleDependency: NetworkManagerProtocol
     
-    public init(moduleOutput: SearchModuleOutput?) {
+    public init(moduleOutput: SearchModuleOutput? = nil, moduleDependency: NetworkManagerProtocol) {
         self.moduleOutput = moduleOutput
+        self.moduleDependency = moduleDependency
     }
 }

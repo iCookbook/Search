@@ -10,7 +10,6 @@
 		F04DE43A290AEA8D00DD4C39 /* Search.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F04DE431290AEA8C00DD4C39 /* Search.framework */; };
 		F04DE43F290AEA8D00DD4C39 /* SearchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04DE43E290AEA8D00DD4C39 /* SearchTests.swift */; };
 		F04DE440290AEA8D00DD4C39 /* Search.h in Headers */ = {isa = PBXBuildFile; fileRef = F04DE434290AEA8C00DD4C39 /* Search.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		F04DE453290AEAE300DD4C39 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = F04DE452290AEAE300DD4C39 /* README.md */; };
 		F04DE45A290AEB3900DD4C39 /* SearchPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04DE454290AEB3900DD4C39 /* SearchPresenter.swift */; };
 		F04DE45B290AEB3900DD4C39 /* SearchPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04DE454290AEB3900DD4C39 /* SearchPresenter.swift */; };
 		F04DE45C290AEB3900DD4C39 /* SearchRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04DE455290AEB3900DD4C39 /* SearchRouter.swift */; };
@@ -23,6 +22,8 @@
 		F04DE463290AEB3900DD4C39 /* SearchAssembly.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04DE458290AEB3900DD4C39 /* SearchAssembly.swift */; };
 		F04DE464290AEB3900DD4C39 /* SearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04DE459290AEB3900DD4C39 /* SearchInteractor.swift */; };
 		F04DE465290AEB3900DD4C39 /* SearchInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04DE459290AEB3900DD4C39 /* SearchInteractor.swift */; };
+		F062D41A290FBB92005EA844 /* Networking.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F062D419290FBB92005EA844 /* Networking.framework */; };
+		F062D41B290FBB92005EA844 /* Networking.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F062D419290FBB92005EA844 /* Networking.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +35,20 @@
 			remoteInfo = Search;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F062D41C290FBB92005EA844 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				F062D41B290FBB92005EA844 /* Networking.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		F04DE431290AEA8C00DD4C39 /* Search.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Search.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -47,6 +62,7 @@
 		F04DE457290AEB3900DD4C39 /* SearchProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchProtocols.swift; sourceTree = "<group>"; };
 		F04DE458290AEB3900DD4C39 /* SearchAssembly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchAssembly.swift; sourceTree = "<group>"; };
 		F04DE459290AEB3900DD4C39 /* SearchInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchInteractor.swift; sourceTree = "<group>"; };
+		F062D419290FBB92005EA844 /* Networking.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Networking.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F062D41A290FBB92005EA844 /* Networking.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +92,7 @@
 				F04DE433290AEA8C00DD4C39 /* Search */,
 				F04DE43D290AEA8D00DD4C39 /* SearchTests */,
 				F04DE432290AEA8C00DD4C39 /* Products */,
+				F062D418290FBB92005EA844 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -109,6 +127,14 @@
 			path = SearchTests;
 			sourceTree = "<group>";
 		};
+		F062D418290FBB92005EA844 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F062D419290FBB92005EA844 /* Networking.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -131,6 +157,7 @@
 				F04DE42D290AEA8C00DD4C39 /* Sources */,
 				F04DE42E290AEA8C00DD4C39 /* Frameworks */,
 				F04DE42F290AEA8C00DD4C39 /* Resources */,
+				F062D41C290FBB92005EA844 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -203,7 +230,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F04DE453290AEAE300DD4C39 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
