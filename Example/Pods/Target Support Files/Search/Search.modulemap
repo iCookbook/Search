@@ -1,0 +1,6 @@
+framework module Search {
+  umbrella header "Search-umbrella.h"
+
+  export *
+  module * { export * }
+}
