@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Search'
-  s.version          = '0.1.0'
+  s.version          = '0.2.0'
   s.summary          = '\'Search\' module.'
   s.homepage         = 'https://github.com/iCookbook/Search'
   s.author           = { 'htmlprogrammist' => '60363270+htmlprogrammist@users.noreply.github.com' }
@@ -14,4 +14,5 @@ Pod::Spec.new do |s|
   s.dependency 'Resources'
   s.dependency 'Networking'
   s.dependency 'Models'
+  s.dependency 'RecipeDetails'
 end
