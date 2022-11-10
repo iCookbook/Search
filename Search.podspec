@@ -14,5 +14,6 @@ Pod::Spec.new do |s|
   s.dependency 'Resources'
   s.dependency 'Networking'
   s.dependency 'Models'
+  s.dependency 'CommonUI'
   s.dependency 'RecipeDetails'
 end
