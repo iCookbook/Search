@@ -7,15 +7,34 @@
 //
 
 import UIKit
+import Networking
+import Search
+import Resources
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        
+        let networkManager: NetworkManagerProtocol = NetworkManager(session: URLSession(configuration: URLSessionConfiguration.default))
+        let context = SearchContext(moduleDependency: networkManager)
+        let assembly = SearchAssembly.assemble(with: context)
+        
+        let navController = UINavigationController(rootViewController: assembly.viewController)
+        navController.navigationBar.prefersLargeTitles = true
+        
+        // Resources.Fonts
+        Fonts.registerFonts()
+        navController.navigationBar.largeTitleTextAttributes = [.font: Fonts.largeTitle()]
+        navController.navigationBar.titleTextAttributes = [.font: Fonts.navControllerTitle()]
+        
+        window.rootViewController = navController
+        window.makeKeyAndVisible()
+        self.window = window
+        
         return true
     }
 
