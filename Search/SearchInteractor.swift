@@ -9,7 +9,6 @@ import Networking
 import Common
 
 final class SearchInteractor: BaseRecipesInteractor {
-    weak var output: SearchInteractorOutput?
 }
 
 extension SearchInteractor: SearchInteractorInput {

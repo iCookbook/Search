@@ -6,10 +6,8 @@
 //
 
 import Common
-import Resources
 
 final class SearchPresenter: BaseRecipesPresenter {
-    weak var view: SearchViewInput?
     
     // MARK: - Init
     
