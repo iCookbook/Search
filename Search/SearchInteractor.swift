@@ -4,11 +4,11 @@
 //
 //  Created by Егор Бадмаев on 27.10.2022.
 //  
-//
 
-import Foundation
+import Networking
+import Common
 
-final class SearchInteractor {
+final class SearchInteractor: BaseRecipesInteractor {
     weak var output: SearchInteractorOutput?
 }
 

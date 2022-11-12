@@ -7,18 +7,18 @@
 //
 
 import UIKit
-import Resources
+import Common
 import CommonUI
+import Resources
 
-final class SearchViewController: RecipesCollectionViewController {
+final class SearchViewController: BaseRecipesViewController {
     
     // MARK: - Private Properties
-    
-    private let output: SearchViewOutput
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
+        scrollView.preservesSuperviewLayoutMargins = true
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
@@ -38,24 +38,13 @@ final class SearchViewController: RecipesCollectionViewController {
         return tableView
     }()
     
-    // MARK: - Init
-    
-    init(output: SearchViewOutput) {
-        self.output = output
-        
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupView()
+        output.requestRandomData()
     }
     
     // MARK: - Private Methods
@@ -66,9 +55,29 @@ final class SearchViewController: RecipesCollectionViewController {
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
+        contentView.addSubview(categoriesTableView)
+        contentView.addSubview(recipesCollectionView)
         
         NSLayoutConstraint.activate([
+            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            
+            categoriesTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            categoriesTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            categoriesTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            recipesCollectionView.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
+            recipesCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            recipesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            recipesCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
         ])
     }
 }

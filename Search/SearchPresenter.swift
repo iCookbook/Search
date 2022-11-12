@@ -3,25 +3,18 @@
 //  Search
 //
 //  Created by Егор Бадмаев on 27.10.2022.
-//  
 //
 
-import Foundation
+import Common
+import Resources
 
-final class SearchPresenter {
+final class SearchPresenter: BaseRecipesPresenter {
     weak var view: SearchViewInput?
-    weak var moduleOutput: SearchModuleOutput?
-    
-    // MARK: - Private Properties
-    
-    private let router: SearchRouterInput
-    private let interactor: SearchInteractorInput
     
     // MARK: - Init
     
     init(router: SearchRouterInput, interactor: SearchInteractorInput) {
-        self.router = router
-        self.interactor = interactor
+        super.init(router: router, interactor: interactor)
     }
 }
 
