@@ -4,7 +4,6 @@
 //
 //  Created by Егор Бадмаев on 27.10.2022.
 //  
-//
 
 import UIKit
 import Networking
@@ -24,7 +23,7 @@ public final class SearchAssembly {
     
     public static func assemble(with context: SearchContext) -> SearchAssembly {
         let router = SearchRouter()
-        let interactor = SearchInteractor()
+        let interactor = SearchInteractor(networkManager: context.moduleDependency)
         let presenter = SearchPresenter(router: router, interactor: interactor)
         let viewController = SearchViewController(output: presenter)
         

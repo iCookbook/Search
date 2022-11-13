@@ -4,31 +4,29 @@
 //
 //  Created by Егор Бадмаев on 27.10.2022.
 //  
-//
 
-import Foundation
+import Common
 
-public protocol SearchModuleInput {
-    var moduleOutput: SearchModuleOutput? { get }
+public protocol SearchModuleInput: BaseRecipesModuleInput {
 }
 
-public protocol SearchModuleOutput: AnyObject {
+public protocol SearchModuleOutput: BaseRecipesModuleOutput {
 }
 
-protocol SearchViewInput: AnyObject {
+protocol SearchViewInput: BaseRecipesViewInput {
 }
 
-protocol SearchViewOutput: AnyObject {
+protocol SearchViewOutput: BaseRecipesViewOutput {
 }
 
-protocol SearchInteractorInput: AnyObject {
+protocol SearchInteractorInput: BaseRecipesInteractorInput {
 }
 
-protocol SearchInteractorOutput: AnyObject {
+protocol SearchInteractorOutput: BaseRecipesInteractorOutput {
 }
 
-protocol SearchRouterInput: AnyObject {
+protocol SearchRouterInput: BaseRecipesRouterInput {
 }
 
-protocol SearchRouterOutput: AnyObject {
+protocol SearchRouterOutput: BaseRecipesModuleOutput {
 }
