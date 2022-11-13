@@ -17,13 +17,20 @@ final class SearchViewController: BaseRecipesViewController {
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
-//        searchBar.barPosition = .
+        searchBar.sizeToFit()
         searchBar.delegate = self
+//        searchBar.showsCancelButton = true
+        searchBar.showsBookmarkButton = true
+        searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
+        searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .selected) // .normal
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
     
     private lazy var searchController: UISearchController = {
-        let searchController = UISearchController(searchResultsController: historyViewController)
+//        let searchController = UISearchController(searchResultsController: historyViewController)
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.placeholder = keywords.randomElement()?.capitalized
         searchController.searchBar.sizeToFit()
         searchController.delegate = self
         searchController.searchBar.delegate = self
@@ -75,12 +82,12 @@ final class SearchViewController: BaseRecipesViewController {
     // MARK: - Private Methods
     
     private func setupView() {
-        navigationItem.titleView = searchController.searchBar
         title = Texts.Search.title
         view.backgroundColor = Colors.systemBackground
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
+        contentView.addSubview(searchController.searchBar)
         contentView.addSubview(categoriesTableView)
         
         contentView.addSubview(recipesCollectionView)
@@ -101,7 +108,11 @@ final class SearchViewController: BaseRecipesViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: view.widthAnchor),
             
-            categoriesTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            searchController.searchBar.topAnchor.constraint(equalTo: contentView.topAnchor),
+            searchController.searchBar.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            searchController.searchBar.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            categoriesTableView.topAnchor.constraint(equalTo: searchController.searchBar.bottomAnchor),
             categoriesTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             categoriesTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
@@ -192,6 +203,13 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        36
+        44
+    }
+}
+
+extension SearchViewController {
+    /// Keywords to show in placeholder of search bar.
+    var keywords: [String] {
+        ["chicken", "beef", "mushroom", "cheese", "pepperoni", "pepper", "garlic", "basil", "onion", "salami", "bacon", "shrimps", "fish", "anchovies", "pepper", "olives", "meat", "veal", "lamb", "meatballs", "turkey"]
     }
 }
