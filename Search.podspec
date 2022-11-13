@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   
   s.dependency 'Resources'
   s.dependency 'Networking'
+  s.dependency 'Persistence'
   s.dependency 'Models'
   s.dependency 'Common'
   s.dependency 'CommonUI'

@@ -14,15 +14,19 @@ public protocol SearchModuleOutput: BaseRecipesModuleOutput {
 }
 
 protocol SearchViewInput: BaseRecipesViewInput {
+    func fillInSearchRequestsHistory(_ searchRequestsHistory: [String])
 }
 
 protocol SearchViewOutput: BaseRecipesViewOutput {
+    func fetchSearchRequestsHistory()
 }
 
 protocol SearchInteractorInput: BaseRecipesInteractorInput {
+    func provideSearchRequestsHistory()
 }
 
 protocol SearchInteractorOutput: BaseRecipesInteractorOutput {
+    func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String])
 }
 
 protocol SearchRouterInput: BaseRecipesRouterInput {
