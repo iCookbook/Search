@@ -15,10 +15,11 @@ final class SearchViewController: BaseRecipesViewController {
     
     // MARK: - Private Properties
     
-    private let scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
-        scrollView.showsVerticalScrollIndicator = false
         scrollView.preservesSuperviewLayoutMargins = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.delegate = self
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
@@ -30,13 +31,15 @@ final class SearchViewController: BaseRecipesViewController {
     }()
     
     private lazy var categoriesTableView: UITableView = {
-        let tableView = NonScrollableTableView()
+        let tableView = NonScrollableTableView(frame: .zero, style: .grouped)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(CategoryTableViewCell.self, forCellReuseIdentifier: CategoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
     }()
+    
+    private let titleRecommendedLabel = TitleLabel(text: Texts.Search.recommended)
     
     // MARK: - Life Cycle
     
@@ -56,7 +59,12 @@ final class SearchViewController: BaseRecipesViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubview(categoriesTableView)
+        contentView.addSubview(titleRecommendedLabel)
+        
         contentView.addSubview(recipesCollectionView)
+        recipesCollectionView.isScrollEnabled = false
+        contentView.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
         
         NSLayoutConstraint.activate([
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
@@ -74,15 +82,43 @@ final class SearchViewController: BaseRecipesViewController {
             categoriesTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             categoriesTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            recipesCollectionView.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
+            titleRecommendedLabel.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
+            titleRecommendedLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            titleRecommendedLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            recipesCollectionView.topAnchor.constraint(equalTo: titleRecommendedLabel.bottomAnchor, constant: 12),
             recipesCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             recipesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             recipesCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            
+            activityIndicator.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor, constant: 60),
+            activityIndicator.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
     }
 }
 
 extension SearchViewController: SearchViewInput {
+}
+
+// MARK: - Collection View
+
+extension SearchViewController {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        /// We need to check that it is not a setup (first launch, when collection view's content size height equals 0) and make usual check for the end of the collection (scroll) view.
+        if (recipesCollectionView.contentSize.height != 0 &&
+            scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
+            /// Fetcing should not be in progress and there should be valid next page url.
+            guard !isFetchingInProgress,
+                  let nextPageUrl = nextPageUrl else { return }
+            
+            isFetchingInProgress = true
+            /// Because it is _event handling_, we need to use `userInteractive` quality of service.
+            DispatchQueue.global(qos: .userInteractive).async {
+                self.output.requestData(urlString: nextPageUrl)
+            }
+        }
+    }
 }
 
 // MARK: - Table View
@@ -109,6 +145,6 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        60
+        36
     }
 }

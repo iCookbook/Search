@@ -8,12 +8,6 @@
 import Common
 
 final class SearchPresenter: BaseRecipesPresenter {
-    
-    // MARK: - Init
-    
-    init(router: SearchRouterInput, interactor: SearchInteractorInput) {
-        super.init(router: router, interactor: interactor)
-    }
 }
 
 extension SearchPresenter: SearchModuleInput {
