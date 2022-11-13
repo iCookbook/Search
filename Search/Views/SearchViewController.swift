@@ -39,8 +39,6 @@ final class SearchViewController: BaseRecipesViewController {
         return tableView
     }()
     
-    private let titleRecommendedLabel = TitleLabel(text: Texts.Search.recommended)
-    
     // MARK: - Life Cycle
     
     override func viewDidLoad() {
@@ -59,10 +57,10 @@ final class SearchViewController: BaseRecipesViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubview(categoriesTableView)
-        contentView.addSubview(titleRecommendedLabel)
         
         contentView.addSubview(recipesCollectionView)
         recipesCollectionView.isScrollEnabled = false
+        
         contentView.addSubview(activityIndicator)
         activityIndicator.startAnimating()
         
@@ -82,11 +80,7 @@ final class SearchViewController: BaseRecipesViewController {
             categoriesTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             categoriesTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            titleRecommendedLabel.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
-            titleRecommendedLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            titleRecommendedLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            
-            recipesCollectionView.topAnchor.constraint(equalTo: titleRecommendedLabel.bottomAnchor, constant: 12),
+            recipesCollectionView.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
             recipesCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             recipesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             recipesCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -104,20 +98,23 @@ extension SearchViewController: SearchViewInput {
 
 extension SearchViewController {
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        /// We need to check that it is not a setup (first launch, when collection view's content size height equals 0) and make usual check for the end of the collection (scroll) view.
-        if (recipesCollectionView.contentSize.height != 0 &&
-            scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
-            /// Fetcing should not be in progress and there should be valid next page url.
-            guard !isFetchingInProgress,
-                  let nextPageUrl = nextPageUrl else { return }
-            
-            isFetchingInProgress = true
-            /// Because it is _event handling_, we need to use `userInteractive` quality of service.
-            DispatchQueue.global(qos: .userInteractive).async {
-                self.output.requestData(urlString: nextPageUrl)
+    // MARK: Header
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleCollectionViewHeader.identifier, for: indexPath) as? TitleCollectionViewHeader else {
+                fatalError("Could not cast to `TitleCollectionViewHeader` for indexPath \(indexPath) in viewForSupplementaryElementOfKind")
             }
+            return header
+        default:
+            // empty view
+            return UICollectionReusableView()
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: view.frame.size.width, height: 36)
     }
 }
 
