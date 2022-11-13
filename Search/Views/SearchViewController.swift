@@ -28,7 +28,6 @@ final class SearchViewController: BaseRecipesViewController {
     }()
     
     private lazy var searchController: UISearchController = {
-//        let searchController = UISearchController(searchResultsController: historyViewController)
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.placeholder = keywords.randomElement()?.capitalized
         searchController.searchBar.sizeToFit()
@@ -37,7 +36,7 @@ final class SearchViewController: BaseRecipesViewController {
         searchController.searchBar.showsBookmarkButton = true
         searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
         searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .highlighted) // .normal
-        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = true
         return searchController
     }()
     
@@ -82,12 +81,14 @@ final class SearchViewController: BaseRecipesViewController {
     // MARK: - Private Methods
     
     private func setupView() {
+        navigationItem.searchController = searchController
+        // removes text from back button's title
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         title = Texts.Search.title
         view.backgroundColor = Colors.systemBackground
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
-        contentView.addSubview(searchController.searchBar)
         contentView.addSubview(categoriesTableView)
         
         contentView.addSubview(recipesCollectionView)
@@ -108,11 +109,7 @@ final class SearchViewController: BaseRecipesViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: view.widthAnchor),
             
-            searchController.searchBar.topAnchor.constraint(equalTo: contentView.topAnchor),
-            searchController.searchBar.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            searchController.searchBar.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            
-            categoriesTableView.topAnchor.constraint(equalTo: searchController.searchBar.bottomAnchor),
+            categoriesTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
             categoriesTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             categoriesTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
