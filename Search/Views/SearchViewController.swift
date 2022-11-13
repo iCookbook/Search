@@ -15,6 +15,27 @@ final class SearchViewController: BaseRecipesViewController {
     
     // MARK: - Private Properties
     
+    private lazy var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+//        searchBar.barPosition = .
+        searchBar.delegate = self
+        return searchBar
+    }()
+    
+    private lazy var searchController: UISearchController = {
+        let searchController = UISearchController(searchResultsController: historyViewController)
+        searchController.searchBar.sizeToFit()
+        searchController.delegate = self
+        searchController.searchBar.delegate = self
+        searchController.searchBar.showsBookmarkButton = true
+        searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
+        searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .highlighted) // .normal
+        searchController.hidesNavigationBarDuringPresentation = false
+        return searchController
+    }()
+    
+    private let historyViewController = HistoryViewController()
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.preservesSuperviewLayoutMargins = true
@@ -45,12 +66,16 @@ final class SearchViewController: BaseRecipesViewController {
         super.viewDidLoad()
         
         setupView()
+        
+        guard let output = output as? SearchViewOutput else { return }
         output.requestRandomData()
+        output.fetchSearchRequestsHistory()
     }
     
     // MARK: - Private Methods
     
     private func setupView() {
+        navigationItem.titleView = searchController.searchBar
         title = Texts.Search.title
         view.backgroundColor = Colors.systemBackground
         
@@ -91,7 +116,32 @@ final class SearchViewController: BaseRecipesViewController {
     }
 }
 
+// MARK: - SearchViewInput
+
 extension SearchViewController: SearchViewInput {
+    
+    func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
+        historyViewController.fillSearchRequestsHistory(with: searchRequestsHistory)
+    }
+}
+
+// MARK: - UISearchBarDelegate, UISearchControllerDelegate
+
+extension SearchViewController: UISearchBarDelegate, UISearchControllerDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = nil
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+    }
+    
+    func searchBarBookmarkButtonClicked(_ searchBar: UISearchBar) {
+        // TODO: Open filter view controller
+        
+    }
 }
 
 // MARK: - Collection View
