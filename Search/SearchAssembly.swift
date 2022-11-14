@@ -25,12 +25,12 @@ public final class SearchAssembly {
         let router = SearchRouter()
         let interactor = SearchInteractor(networkManager: context.moduleDependency)
         let presenter = SearchPresenter(router: router, interactor: interactor)
-        let viewController = SearchViewController(output: presenter)
+        let viewController = SearchViewController(presenter: presenter)
         
         presenter.view = viewController
         presenter.moduleOutput = context.moduleOutput
         
-        interactor.output = presenter
+        interactor.presenter = presenter
         router.viewController = viewController
         
         return SearchAssembly(view: viewController, input: presenter, router: router)

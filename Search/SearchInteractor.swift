@@ -14,7 +14,7 @@ final class SearchInteractor: BaseRecipesInteractor {
 
 extension SearchInteractor: SearchInteractorInput {
     func provideSearchRequestsHistory() {
-        guard let output = output as? SearchInteractorOutput else { return }
+        guard let presenter = presenter as? SearchInteractorOutput else { return }
         output.didProvidedSearchRequestsHistory(UserDefaults.searchRequestsHistory)
     }
 }

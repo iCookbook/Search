@@ -19,7 +19,6 @@ final class SearchViewController: BaseRecipesViewController {
         let searchBar = UISearchBar()
         searchBar.sizeToFit()
         searchBar.delegate = self
-//        searchBar.showsCancelButton = true
         searchBar.showsBookmarkButton = true
         searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
         searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .selected) // .normal
@@ -61,6 +60,7 @@ final class SearchViewController: BaseRecipesViewController {
         let tableView = NonScrollableTableView(frame: .zero, style: .grouped)
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.estimatedRowHeight = 44
         tableView.register(CategoryTableViewCell.self, forCellReuseIdentifier: CategoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
@@ -73,9 +73,9 @@ final class SearchViewController: BaseRecipesViewController {
         
         setupView()
         
-        guard let output = output as? SearchViewOutput else { return }
-        output.requestRandomData()
-        output.fetchSearchRequestsHistory()
+        guard let presenter = presenter as? SearchViewOutput else { return }
+        presenter.requestRandomData()
+        presenter.fetchSearchRequestsHistory()
     }
     
     // MARK: - Private Methods
@@ -187,8 +187,12 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryTableViewCell.identifier, for: indexPath) as? CategoryTableViewCell else {
             fatalError("Could not cast table view cell to `CategoryTableViewCell` for indexPath: \(indexPath)")
         }
-//        cell.configure(category: <#T##Dish#>)
+        cell.configure(category: .sandwiches)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
