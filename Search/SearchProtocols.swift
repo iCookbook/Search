@@ -6,6 +6,7 @@
 //  
 
 import Common
+import Models
 
 public protocol SearchModuleInput: BaseRecipesModuleInput {
 }
@@ -19,6 +20,7 @@ protocol SearchViewInput: BaseRecipesViewInput {
 
 protocol SearchViewOutput: BaseRecipesViewOutput {
     func fetchSearchRequestsHistory()
+    func requestByCategory(_ category: Dish)
 }
 
 protocol SearchInteractorInput: BaseRecipesInteractorInput {

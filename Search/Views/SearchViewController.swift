@@ -9,6 +9,7 @@
 import UIKit
 import Common
 import CommonUI
+import Models
 import Resources
 
 final class SearchViewController: BaseRecipesViewController {
@@ -65,6 +66,9 @@ final class SearchViewController: BaseRecipesViewController {
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
     }()
+    
+    private let randomIndex = Int.random(in: 0..<Dish.dishes.count - 5)
+    private lazy var categories: [Dish] = Array(Dish.dishes.shuffled()[randomIndex..<randomIndex + 5])
     
     // MARK: - Life Cycle
     
@@ -180,19 +184,22 @@ extension SearchViewController {
 
 extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        6
+        categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryTableViewCell.identifier, for: indexPath) as? CategoryTableViewCell else {
             fatalError("Could not cast table view cell to `CategoryTableViewCell` for indexPath: \(indexPath)")
         }
-        cell.configure(category: .sandwiches)
+        cell.configure(category: categories[indexPath.row])
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        guard let presenter = presenter as? SearchViewOutput else { return }
+        presenter.requestByCategory(categories[indexPath.row])
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

@@ -6,6 +6,7 @@
 //
 
 import Common
+import Models
 
 final class SearchPresenter: BaseRecipesPresenter {
 }
@@ -17,6 +18,10 @@ extension SearchPresenter: SearchViewOutput {
     func fetchSearchRequestsHistory() {
         guard let interactor = interactor as? SearchInteractorInput else { return }
         interactor.provideSearchRequestsHistory()
+    }
+    
+    func requestByCategory(_ category: Dish) {
+        
     }
 }
 
