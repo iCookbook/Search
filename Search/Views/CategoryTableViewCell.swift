@@ -7,8 +7,18 @@
 
 import UIKit
 import Models
+import Resources
 
 final class CategoryTableViewCell: UITableViewCell {
+    
+    // MARK: - Private Properties
+    
+    private let mainLabel: UILabel = {
+        let label = UILabel()
+        label.font = Fonts.body()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
     
     // MARK: - Init
     
@@ -25,12 +35,19 @@ final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Private Methods
     
     private func setupView() {
+        contentView.addSubview(mainLabel)
         
+        NSLayoutConstraint.activate([
+            mainLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: contentView.layoutMargins.left * 2),
+            mainLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -contentView.layoutMargins.right * 2),
+            mainLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: contentView.layoutMargins.top * 1.5),
+            mainLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -contentView.layoutMargins.bottom * 1.5),
+        ])
     }
     
     // MARK: - Public Methods
     
-    public func configure(category: Dish) {
-        
+    public func configure(category: Cuisine) {
+        mainLabel.text = "\(category.emoji)  \(category.rawValue.localized)"
     }
 }
