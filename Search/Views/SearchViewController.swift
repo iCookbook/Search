@@ -195,7 +195,7 @@ extension SearchViewController {
         /// 2. Categories table view was hidden;
         /// 3. Check for the end of the collection (scroll) view.
         if (recipesCollectionView.contentSize.height != 0 &&
-            categoriesTableView.isHidden &&
+            categories.isEmpty &&
             scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
             /// Fetcing should not be in progress and there should be valid next page url.
             guard !isFetchingInProgress,
