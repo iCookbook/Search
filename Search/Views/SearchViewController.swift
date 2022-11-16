@@ -29,8 +29,6 @@ final class SearchViewController: BaseRecipesViewController {
         return searchController
     }()
     
-    private let historyViewController = HistoryViewController()
-    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.preservesSuperviewLayoutMargins = true
@@ -161,7 +159,7 @@ final class SearchViewController: BaseRecipesViewController {
 extension SearchViewController: SearchViewInput {
     
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
-        historyViewController.fillSearchRequestsHistory(with: searchRequestsHistory)
+//        self.searchRequestsHistory = searchRequestsHistory
     }
 }
 
