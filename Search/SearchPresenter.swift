@@ -24,6 +24,11 @@ extension SearchPresenter: SearchViewOutput {
         guard let interactor = interactor as? SearchInteractorInput else { return }
         interactor.requestRandomData(by: category)
     }
+    
+    func searchBarButtonClicked(with text: String) {
+        guard let interactor = interactor as? SearchInteractorInput else { return }
+        interactor.requestData(by: text)
+    }
 }
 
 extension SearchPresenter: SearchInteractorOutput {

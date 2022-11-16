@@ -32,4 +32,17 @@ extension SearchInteractor: SearchInteractorInput {
             }
         }
     }
+    
+    func requestData(by keyword: String) {
+        let endpoint = Endpoint.create(by: keyword)
+        let request = NetworkRequest(endpoint: endpoint)
+        networkManager.getResponse(request: request) { [unowned self] (result) in
+            switch result {
+            case .success(let response):
+                presenter?.didProvidedResponse(response, withOverridingCurrentData: true)
+            case .failure(let error):
+                presenter?.handleError(error)
+            }
+        }
+    }
 }

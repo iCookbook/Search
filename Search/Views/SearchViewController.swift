@@ -60,6 +60,10 @@ final class SearchViewController: BaseRecipesViewController {
         return tableView
     }()
     
+    private lazy var categoriesTableViewTopAnchor = NSLayoutConstraint(item: categoriesTableView, attribute: .top, relatedBy: .equal, toItem: categoriesTitleLabel, attribute: .bottom, multiplier: 1, constant: 4)
+    private lazy var recommendedTitleLabelTopAnchor = NSLayoutConstraint(item: recommendedTitleLabel, attribute: .top, relatedBy: .equal, toItem: categoriesTableView, attribute: .bottom, multiplier: 1, constant: 12)
+    private lazy var recipesCollectionViewTopAnchor = NSLayoutConstraint(item: recipesCollectionView, attribute: .top, relatedBy: .equal, toItem: recommendedTitleLabel, attribute: .bottom, multiplier: 1, constant: 4)
+    
     private let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
     private lazy var categories: [Cuisine] = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
     
@@ -81,11 +85,20 @@ final class SearchViewController: BaseRecipesViewController {
     
     // MARK: - Private Methods
     
-    private func hideCategoriesTableViewSection() {
+    private func handleViewOnUpdatingData() {
+        activityIndicator.startAnimating()
+        
         categoriesTitleLabel.text = nil
         recommendedTitleLabel.text = nil
         categories = []
         categoriesTableView.reloadData()
+        
+        UIView.animate(withDuration: 1.0, delay: 0.0, options: [.transitionFlipFromBottom, .curveEaseOut], animations: { [unowned self] in
+            categoriesTableViewTopAnchor.constant = 0
+            recommendedTitleLabelTopAnchor.constant = 0
+            recipesCollectionViewTopAnchor.constant = 0
+            view.layoutIfNeeded()
+        })
     }
     
     private func setupView() {
@@ -123,15 +136,15 @@ final class SearchViewController: BaseRecipesViewController {
             categoriesTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             categoriesTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            categoriesTableView.topAnchor.constraint(equalTo: categoriesTitleLabel.bottomAnchor),
+            categoriesTableViewTopAnchor,
             categoriesTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             categoriesTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            recommendedTitleLabel.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
+            recommendedTitleLabelTopAnchor,
             recommendedTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             recommendedTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
-            recipesCollectionView.topAnchor.constraint(equalTo: recommendedTitleLabel.bottomAnchor),
+            recipesCollectionViewTopAnchor,
             recipesCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             recipesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             recipesCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
@@ -162,7 +175,11 @@ extension SearchViewController: UISearchBarDelegate, UISearchControllerDelegate 
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
+        guard let presenter = presenter as? SearchViewOutput,
+              let keyword = searchBar.text
+        else { return }
+        presenter.searchBarButtonClicked(with: keyword)
+        handleViewOnUpdatingData()
     }
     
     func searchBarBookmarkButtonClicked(_ searchBar: UISearchBar) {
@@ -233,7 +250,7 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.categoryDidTapped(categories[indexPath.row])
         activityIndicator.startAnimating()
-        hideCategoriesTableViewSection()
+        handleViewOnUpdatingData()
     }
 }
 
