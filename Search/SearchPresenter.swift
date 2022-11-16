@@ -20,8 +20,9 @@ extension SearchPresenter: SearchViewOutput {
         interactor.provideSearchRequestsHistory()
     }
     
-    func requestByCategory(_ category: Dish) {
-        
+    func categoryDidTapped(_ category: Cuisine) {
+        guard let interactor = interactor as? SearchInteractorInput else { return }
+        interactor.requestRandomData(by: category)
     }
 }
 

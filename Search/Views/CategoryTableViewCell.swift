@@ -15,7 +15,7 @@ final class CategoryTableViewCell: UITableViewCell {
     
     private let mainLabel: UILabel = {
         let label = UILabel()
-        label.font = Fonts.cellTitle()
+        label.font = Fonts.body()
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -47,7 +47,7 @@ final class CategoryTableViewCell: UITableViewCell {
     
     // MARK: - Public Methods
     
-    public func configure(category: Dish) {
-        mainLabel.text = "\(category.emoji) \(category.rawValue.localized)"
+    public func configure(category: Cuisine) {
+        mainLabel.text = "\(category.emoji)  \(category.rawValue.localized)"
     }
 }

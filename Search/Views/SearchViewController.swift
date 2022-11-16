@@ -67,8 +67,8 @@ final class SearchViewController: BaseRecipesViewController {
         return tableView
     }()
     
-    private let randomIndex = Int.random(in: 0..<Dish.dishes.count - 5)
-    private lazy var categories: [Dish] = Array(Dish.dishes.shuffled()[randomIndex..<randomIndex + 5])
+    private let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
+    private lazy var categories: [Cuisine] = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
     
     // MARK: - Life Cycle
     
@@ -199,14 +199,14 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         guard let presenter = presenter as? SearchViewOutput else { return }
-        presenter.requestByCategory(categories[indexPath.row])
+        presenter.categoryDidTapped(categories[indexPath.row])
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TitleTableViewHeader.identifier) as? TitleTableViewHeader else {
             fatalError("Could not cast table view cell to `TitleTableViewHeader` in section: \(section)")
         }
-        header.configure(title: Texts.Search.categories)
+        header.configure(title: Texts.Search.cuisines)
         return header
     }
     

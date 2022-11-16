@@ -20,11 +20,12 @@ protocol SearchViewInput: BaseRecipesViewInput {
 
 protocol SearchViewOutput: BaseRecipesViewOutput {
     func fetchSearchRequestsHistory()
-    func requestByCategory(_ category: Dish)
+    func categoryDidTapped(_ category: Cuisine)
 }
 
 protocol SearchInteractorInput: BaseRecipesInteractorInput {
     func provideSearchRequestsHistory()
+    func requestRandomData(by category: Cuisine)
 }
 
 protocol SearchInteractorOutput: BaseRecipesInteractorOutput {
