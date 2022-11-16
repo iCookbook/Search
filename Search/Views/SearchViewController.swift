@@ -16,17 +16,6 @@ final class SearchViewController: BaseRecipesViewController {
     
     // MARK: - Private Properties
     
-    private lazy var searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
-        searchBar.sizeToFit()
-        searchBar.delegate = self
-        searchBar.showsBookmarkButton = true
-        searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
-        searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .selected) // .normal
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        return searchBar
-    }()
-    
     private lazy var searchController: UISearchController = {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.placeholder = keywords.randomElement()?.capitalized
@@ -57,8 +46,12 @@ final class SearchViewController: BaseRecipesViewController {
         return view
     }()
     
+    /// These labels were implemented here, not as headers, because it is much easier to hide them in view controller.
+    private let categoriesTitleLabel = TitleLabel(text: Texts.Search.cuisines)
+    private let recommendedTitleLabel = TitleLabel(text: Texts.Search.recommended)
+    
     private lazy var categoriesTableView: UITableView = {
-        let tableView = NonScrollableTableView(frame: .zero, style: .grouped)
+        let tableView = NonScrollableTableView()
         tableView.delegate = self
         tableView.dataSource = self
         tableView.estimatedRowHeight = 44
@@ -82,7 +75,18 @@ final class SearchViewController: BaseRecipesViewController {
         presenter.fetchSearchRequestsHistory()
     }
     
+    override func turnOnOfflineMode() {
+        // TODO: Implement offline mode
+    }
+    
     // MARK: - Private Methods
+    
+    private func hideCategoriesTableViewSection() {
+        categoriesTitleLabel.text = nil
+        recommendedTitleLabel.text = nil
+        categories = []
+        categoriesTableView.reloadData()
+    }
     
     private func setupView() {
         navigationItem.searchController = searchController
@@ -93,8 +97,10 @@ final class SearchViewController: BaseRecipesViewController {
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
+        contentView.addSubview(categoriesTitleLabel)
         contentView.addSubview(categoriesTableView)
         
+        contentView.addSubview(recommendedTitleLabel)
         contentView.addSubview(recipesCollectionView)
         recipesCollectionView.isScrollEnabled = false
         
@@ -113,16 +119,25 @@ final class SearchViewController: BaseRecipesViewController {
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
             contentView.widthAnchor.constraint(equalTo: view.widthAnchor),
             
-            categoriesTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            categoriesTitleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+            categoriesTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            categoriesTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            categoriesTableView.topAnchor.constraint(equalTo: categoriesTitleLabel.bottomAnchor),
             categoriesTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             categoriesTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             
-            recipesCollectionView.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
+            recommendedTitleLabel.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor),
+            recommendedTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            recommendedTitleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            
+            recipesCollectionView.topAnchor.constraint(equalTo: recommendedTitleLabel.bottomAnchor),
             recipesCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             recipesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             recipesCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            activityIndicator.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor, constant: 60),
+//            activityIndicator.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor, constant: 60),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
             activityIndicator.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
     }
@@ -152,7 +167,6 @@ extension SearchViewController: UISearchBarDelegate, UISearchControllerDelegate 
     
     func searchBarBookmarkButtonClicked(_ searchBar: UISearchBar) {
         // TODO: Open filter view controller
-        
     }
 }
 
@@ -160,23 +174,41 @@ extension SearchViewController: UISearchBarDelegate, UISearchControllerDelegate 
 
 extension SearchViewController {
     
-    // MARK: Header
-    
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        switch kind {
-        case UICollectionView.elementKindSectionHeader:
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: TitleCollectionViewHeader.identifier, for: indexPath) as? TitleCollectionViewHeader else {
-                fatalError("Could not cast to `TitleCollectionViewHeader` for indexPath \(indexPath) in viewForSupplementaryElementOfKind")
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        /// We need to check:
+        /// 1. it is not a setup (first launch, when collection view's content size height equals 0);
+        /// 2. Categories table view was hidden;
+        /// 3. Check for the end of the collection (scroll) view.
+        if (recipesCollectionView.contentSize.height != 0 &&
+            categoriesTableView.isHidden &&
+            scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
+            /// Fetcing should not be in progress and there should be valid next page url.
+            guard !isFetchingInProgress,
+                  let nextPageUrl = nextPageUrl else { return }
+            
+            isFetchingInProgress = true
+            /// Because it is _event handling_, we need to use `userInteractive` quality of service.
+            DispatchQueue.global(qos: .userInteractive).async {
+                self.presenter.requestData(urlString: nextPageUrl)
             }
-            return header
-        default:
-            // empty view
-            return UICollectionReusableView()
         }
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: view.frame.size.width, height: 36)
+    // MARK: Footer
+    
+    override func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
+        switch elementKind {
+        case UICollectionView.elementKindSectionFooter:
+            guard let footer = view as? LoadingCollectionViewFooter else {
+                fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
+            }
+            /// If there is link to the next page and there is no categories start loading.
+            if nextPageUrl != nil && categories.isEmpty {
+                footer.startActivityIndicator()
+            }
+        default:
+            break
+        }
     }
 }
 
@@ -200,18 +232,8 @@ extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
         
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.categoryDidTapped(categories[indexPath.row])
-    }
-    
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TitleTableViewHeader.identifier) as? TitleTableViewHeader else {
-            fatalError("Could not cast table view cell to `TitleTableViewHeader` in section: \(section)")
-        }
-        header.configure(title: Texts.Search.cuisines)
-        return header
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        44
+        activityIndicator.startAnimating()
+        hideCategoriesTableViewSection()
     }
 }
 
