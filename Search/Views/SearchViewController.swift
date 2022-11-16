@@ -58,10 +58,12 @@ final class SearchViewController: BaseRecipesViewController {
         return tableView
     }()
     
+    /// Constraints, that were extracted here to change `constant` in `handleViewOnUpdatingData` method.
     private lazy var categoriesTableViewTopAnchor = NSLayoutConstraint(item: categoriesTableView, attribute: .top, relatedBy: .equal, toItem: categoriesTitleLabel, attribute: .bottom, multiplier: 1, constant: 4)
     private lazy var recommendedTitleLabelTopAnchor = NSLayoutConstraint(item: recommendedTitleLabel, attribute: .top, relatedBy: .equal, toItem: categoriesTableView, attribute: .bottom, multiplier: 1, constant: 12)
-    private lazy var recipesCollectionViewTopAnchor = NSLayoutConstraint(item: recipesCollectionView, attribute: .top, relatedBy: .equal, toItem: recommendedTitleLabel, attribute: .bottom, multiplier: 1, constant: 4)
+    private lazy var recipesCollectionViewTopAnchor = NSLayoutConstraint(item: recipesCollectionView, attribute: .top, relatedBy: .equal, toItem: recommendedTitleLabel, attribute: .bottom, multiplier: 1, constant: 8)
     
+    /// This code choose 5 categories randomly.
     private let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
     private lazy var categories: [Cuisine] = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
     
@@ -83,6 +85,7 @@ final class SearchViewController: BaseRecipesViewController {
     
     // MARK: - Private Methods
     
+    /// When user tapps on a category or searching something, we need to display activity indicator and hide table view with all titles.
     private func handleViewOnUpdatingData() {
         activityIndicator.startAnimating()
         
@@ -147,8 +150,7 @@ final class SearchViewController: BaseRecipesViewController {
             recipesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             recipesCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-//            activityIndicator.topAnchor.constraint(equalTo: categoriesTableView.bottomAnchor, constant: 60),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: 20),
             activityIndicator.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
     }
@@ -176,6 +178,7 @@ extension SearchViewController: UISearchBarDelegate, UISearchControllerDelegate 
         guard let presenter = presenter as? SearchViewOutput,
               let keyword = searchBar.text
         else { return }
+        
         presenter.searchBarButtonClicked(with: keyword)
         handleViewOnUpdatingData()
     }

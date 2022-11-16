@@ -7,7 +7,6 @@
 
 import Common
 import Networking
-import Persistence
 import Models
 
 final class SearchInteractor: BaseRecipesInteractor {
