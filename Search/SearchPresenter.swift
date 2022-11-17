@@ -18,7 +18,7 @@ extension SearchPresenter: SearchViewOutput {
     func fetchSearchRequestsHistory() {
         guard let interactor = interactor as? SearchInteractorInput else { return }
         
-        DispatchQueue.global(qos: .userInteractive).async {
+        DispatchQueue.global(qos: .utility).async {
             interactor.provideSearchRequestsHistory()
         }
     }
@@ -41,6 +41,7 @@ extension SearchPresenter: SearchViewOutput {
 }
 
 extension SearchPresenter: SearchInteractorOutput {
+    
     func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         guard let view = view as? SearchViewInput else { return }
         view.fillInSearchRequestsHistory(searchRequestsHistory)

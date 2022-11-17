@@ -20,7 +20,6 @@ final class SearchViewController: BaseRecipesViewController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.placeholder = keywords.randomElement()?.capitalized
         searchController.searchBar.sizeToFit()
-        searchController.delegate = self
         searchController.searchBar.delegate = self
         searchController.searchBar.showsBookmarkButton = true
         searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
@@ -48,12 +47,7 @@ final class SearchViewController: BaseRecipesViewController {
     private let categoriesTitleLabel = TitleLabel(text: Texts.Search.cuisines)
     private let recommendedTitleLabel = TitleLabel(text: Texts.Search.recommended)
     
-    
-    /// This code choose 5 categories randomly.
-    private let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
-    private lazy var categories: [Cuisine] = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
-    
-    private lazy var categoriesTableViewDataSource = SearchCategoriesTableViewDataSource(categories: categories)
+    private let categoriesTableViewDataSource = SearchCategoriesTableViewDataSource()
     private lazy var categoriesTableView: UITableView = {
         let tableView = NonScrollableTableView()
         tableView.delegate = categoriesTableViewDataSource
@@ -69,17 +63,13 @@ final class SearchViewController: BaseRecipesViewController {
     private lazy var recommendedTitleLabelTopAnchor = NSLayoutConstraint(item: recommendedTitleLabel, attribute: .top, relatedBy: .equal, toItem: categoriesTableView, attribute: .bottom, multiplier: 1, constant: 12)
     private lazy var recipesCollectionViewTopAnchor = NSLayoutConstraint(item: recipesCollectionView, attribute: .top, relatedBy: .equal, toItem: recommendedTitleLabel, attribute: .bottom, multiplier: 1, constant: 8)
     
-    /// History of search user's search requests provided from the UserDefaults.
-    private var searchRequestsHistory = [String]()
-    
-    private lazy var searchRequestsTableViewDataSource = SearchRequestsTableViewDataSource(searchRequestsHistory: searchRequestsHistory)
-    
+    private let searchRequestsTableViewDataSource = SearchRequestsTableViewDataSource()
     private lazy var searchRequestsHistoryTableView: UITableView = {
         let tableView = NonScrollableTableView()
         tableView.delegate = searchRequestsTableViewDataSource
         tableView.dataSource = searchRequestsTableViewDataSource
         tableView.estimatedRowHeight = 44
-        tableView.register(CategoryTableViewCell.self, forCellReuseIdentifier: CategoryTableViewCell.identifier)
+        tableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: HistoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
     }()
@@ -129,6 +119,10 @@ final class SearchViewController: BaseRecipesViewController {
         
         searchRequestsTableViewDataSource.view = self
         categoriesTableViewDataSource.view = self
+        /// This code choose 5 categories randomly.
+        let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
+        let categories = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
+        categoriesTableViewDataSource.fillInData(categories: categories)
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -181,14 +175,16 @@ final class SearchViewController: BaseRecipesViewController {
 
 extension SearchViewController: SearchViewInput {
     
+    /// Provides search requests history to the data source.
+    /// - Parameter searchRequestsHistory: search requests history from UserDefaults.
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
-        self.searchRequestsHistory = searchRequestsHistory
+        searchRequestsTableViewDataSource.fillInData(searchRequestsHistory: searchRequestsHistory)
     }
 }
 
-// MARK: - UISearchBarDelegate, UISearchControllerDelegate
+// MARK: - UISearchBarDelegate
 
-extension SearchViewController: UISearchBarDelegate, UISearchControllerDelegate {
+extension SearchViewController: UISearchBarDelegate {
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         // TODO: Implement opening table view with `searchRequestsHistory`
@@ -224,7 +220,7 @@ extension SearchViewController {
         /// 2. Categories table view was hidden;
         /// 3. Check for the end of the collection (scroll) view.
         if (recipesCollectionView.contentSize.height != 0 &&
-            categories.isEmpty &&
+            categoriesTableViewDataSource.isEmpty() &&
             scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
             /// Fetcing should not be in progress and there should be valid next page url.
             guard !isFetchingInProgress,
@@ -247,7 +243,7 @@ extension SearchViewController {
                 fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
             }
             /// If there is link to the next page and there is no categories start loading.
-            if nextPageUrl != nil && categories.isEmpty {
+            if nextPageUrl != nil && categoriesTableViewDataSource.isEmpty() {
                 footer.startActivityIndicator()
             }
         default:

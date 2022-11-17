@@ -9,6 +9,8 @@ import UIKit
 import Models
 
 protocol SearchRequestsTableViewDataSourceDelegate: AnyObject {
+    /// Method to provide data to the view controller.
+    /// - Parameter keyword: data to provide.
     func didSelectRowWith(keyword: String)
 }
 
@@ -19,15 +21,14 @@ final class SearchRequestsTableViewDataSource: NSObject {
     
     // MARK: - Private Properties
     
-    private var searchRequestsHistory: [String]
-    
-    // MARK: - Init
-    
-    init(searchRequestsHistory: [String]) {
-        self.searchRequestsHistory = searchRequestsHistory
-    }
+    /// History of search user's search requests provided from the UserDefaults.
+    private var searchRequestsHistory = [String]()
     
     // MARK: - Public Methods
+    
+    public func fillInData(searchRequestsHistory: [String]) {
+        self.searchRequestsHistory = searchRequestsHistory
+    }
     
     /// Clears all data.
     public func clearData() {

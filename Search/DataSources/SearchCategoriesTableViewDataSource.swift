@@ -9,6 +9,8 @@ import UIKit
 import Models
 
 protocol SearchCategoriesTableViewDataSourceDelegate: AnyObject {
+    /// Method to provide data to the view controller.
+    /// - Parameter category: data to provide.
     func didSelectRowWith(category: Cuisine)
 }
 
@@ -19,18 +21,20 @@ final class SearchCategoriesTableViewDataSource: NSObject {
     
     // MARK: - Private Properties
     
-    private var categories: [Cuisine]
-    
-    // MARK: - Init
-    
-    init(categories: [Cuisine]) {
-        self.categories = categories
-    }
+    private var categories = [Cuisine]()
     
     // MARK: - Public Methods
     
+    public func fillInData(categories: [Cuisine]) {
+        self.categories = categories
+    }
+    
     public func clearData() {
         categories = []
+    }
+    
+    public func isEmpty() -> Bool {
+        categories.isEmpty
     }
 }
 
