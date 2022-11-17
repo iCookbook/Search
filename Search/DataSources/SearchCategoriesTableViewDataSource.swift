@@ -20,7 +20,7 @@ protocol SearchCategoriesTableViewDataSourceDelegate: AnyObject {
 final class SearchCategoriesTableViewDataSource: NSObject {
     
     /// Link to the view controller to provide delegate methods.
-    weak var view: SearchCategoriesTableViewDataSourceDelegate?
+    weak var delegate: SearchCategoriesTableViewDataSourceDelegate?
     
     // MARK: - Private Properties
     
@@ -60,6 +60,6 @@ extension SearchCategoriesTableViewDataSource: UITableViewDelegate, UITableViewD
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        view?.didSelectRowWith(category: categories[indexPath.row])
+        delegate?.didSelectRowWith(category: categories[indexPath.row])
     }
 }

@@ -24,7 +24,7 @@ final class SearchViewController: BaseRecipesViewController {
         searchController.searchBar.showsBookmarkButton = true
         searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
         searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .highlighted) // .normal
-        searchController.hidesNavigationBarDuringPresentation = true
+        searchController.hidesNavigationBarDuringPresentation = false
         return searchController
     }()
     
@@ -95,7 +95,6 @@ final class SearchViewController: BaseRecipesViewController {
     /// When user tapps on a category or searching something, we need to display activity indicator and hide table view with all titles.
     private func handleViewOnSearching() {
         activityIndicator.startAnimating()
-        hideHistoryTableView()
         
         categoriesTitleLabel.text = nil
         recommendedTitleLabel.text = nil
@@ -118,8 +117,8 @@ final class SearchViewController: BaseRecipesViewController {
         title = Texts.Search.title
         view.backgroundColor = Colors.systemBackground
         
-        searchRequestsTableViewDataSource.view = self
-        categoriesTableViewDataSource.view = self
+        searchRequestsTableViewDataSource.delegate = self
+        categoriesTableViewDataSource.delegate = self
         /// This code choose 5 categories randomly.
         let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
         let categories = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
@@ -173,7 +172,6 @@ final class SearchViewController: BaseRecipesViewController {
     
     private func showHistoryTableView() {
         contentView.addSubview(searchRequestsHistoryTableView)
-//        contentView.bringSubviewToFront(searchRequestsHistoryTableView)
         
         NSLayoutConstraint.activate([
             searchRequestsHistoryTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -212,10 +210,13 @@ extension SearchViewController: UISearchBarDelegate {
         showHistoryTableView()
     }
     
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        hideHistoryTableView()
+    }
+    
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
         searchBar.resignFirstResponder()
-        hideHistoryTableView()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -229,7 +230,13 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     func searchBarBookmarkButtonClicked(_ searchBar: UISearchBar) {
-        // TODO: Open filter view controller
+        let filterViewController = UINavigationController(rootViewController: FilterViewController(delegate: self))
+        
+        if #available(iOS 15.0, *),
+           let sheet = filterViewController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+        }
+        present(filterViewController, animated: true)
     }
 }
 
@@ -294,6 +301,7 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.searchBarButtonClicked(with: keyword)
         
+        searchController.searchBar.text = keyword
         handleViewOnSearching()
     }
     
@@ -301,6 +309,12 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.clearSearchRequestsHistory()
     }
+}
+
+// MARK: - FilterDelegateProtocol
+
+extension SearchViewController: FilterDelegateProtocol {
+    
 }
 
 extension SearchViewController {

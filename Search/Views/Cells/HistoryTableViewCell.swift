@@ -21,6 +21,7 @@ final class HistoryTableViewCell: UITableViewCell {
     private let arrowImageView: UIImageView = {
         let imageView = UIImageView(image: Images.Search.searchArrow)
         imageView.tintColor = .gray
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
@@ -28,6 +29,7 @@ final class HistoryTableViewCell: UITableViewCell {
         let stackView = UIStackView(arrangedSubviews: [mainLabel, arrowImageView])
         stackView.axis = .horizontal
         stackView.distribution = .fill
+        stackView.alignment = .center
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
@@ -58,7 +60,11 @@ final class HistoryTableViewCell: UITableViewCell {
         NSLayoutConstraint.activate([
             mainStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
-            mainStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            mainStackView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            mainStackView.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+            
+            arrowImageView.heightAnchor.constraint(equalToConstant: 11),
+            arrowImageView.widthAnchor.constraint(equalToConstant: 11),
         ])
     }
 }

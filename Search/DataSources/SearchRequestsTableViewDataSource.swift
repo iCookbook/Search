@@ -25,7 +25,7 @@ protocol SearchRequestsTableViewDataSourceDelegate: AnyObject {
 final class SearchRequestsTableViewDataSource: NSObject {
     
     /// Link to the view controller to provide delegate methods.
-    weak var view: SearchRequestsTableViewDataSourceDelegate?
+    weak var delegate: SearchRequestsTableViewDataSourceDelegate?
     
     // MARK: - Private Properties
     
@@ -44,7 +44,7 @@ final class SearchRequestsTableViewDataSource: NSObject {
     }
     
     @objc public func clearHistoryButtonTapped() {
-        view?.clearHistoryButtonTapped()
+        delegate?.clearHistoryButtonTapped()
     }
 }
 
@@ -67,7 +67,7 @@ extension SearchRequestsTableViewDataSource: UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        view?.didSelectRowWith(keyword: searchRequestsHistory[indexPath.row])
+        delegate?.didSelectRowWith(keyword: searchRequestsHistory[indexPath.row])
     }
     
     // MARK: Header
@@ -76,7 +76,7 @@ extension SearchRequestsTableViewDataSource: UITableViewDelegate, UITableViewDat
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TitleTableViewHeader.identifier) as? TitleTableViewHeader else {
             fatalError("Could not cast table view header to `TitleTableViewHeader` for section: \(section)")
         }
-        header.configure(title: Texts.Search.recent)
+        header.configure(title: Texts.Search.recent, buttonTitle: Texts.Search.clear)
         return header
     }
     
