@@ -33,6 +33,9 @@ extension SearchInteractor: SearchInteractorInput {
     }
     
     func requestData(by keyword: String) {
+        /// Adds new keyword to the search history.
+        UserDefaults.searchRequestsHistory.append(keyword)
+        
         let endpoint = Endpoint.create(by: keyword)
         let request = NetworkRequest(endpoint: endpoint)
         networkManager.getResponse(request: request) { [unowned self] (result) in

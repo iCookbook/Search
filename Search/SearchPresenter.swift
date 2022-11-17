@@ -17,17 +17,26 @@ extension SearchPresenter: SearchModuleInput {
 extension SearchPresenter: SearchViewOutput {
     func fetchSearchRequestsHistory() {
         guard let interactor = interactor as? SearchInteractorInput else { return }
-        interactor.provideSearchRequestsHistory()
+        
+        DispatchQueue.global(qos: .userInteractive).async {
+            interactor.provideSearchRequestsHistory()
+        }
     }
     
     func categoryDidTapped(_ category: Cuisine) {
         guard let interactor = interactor as? SearchInteractorInput else { return }
-        interactor.requestRandomData(by: category)
+        
+        DispatchQueue.global(qos: .userInteractive).async {
+            interactor.requestRandomData(by: category)
+        }
     }
     
     func searchBarButtonClicked(with text: String) {
         guard let interactor = interactor as? SearchInteractorInput else { return }
-        interactor.requestData(by: text)
+        
+        DispatchQueue.global(qos: .userInteractive).async {
+            interactor.requestData(by: text)
+        }
     }
 }
 
