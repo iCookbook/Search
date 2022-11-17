@@ -20,14 +20,29 @@ final class HistoryTableViewCell: UITableViewCell {
     
     private let arrowImageView: UIImageView = {
         let imageView = UIImageView(image: Images.Search.searchArrow)
+        imageView.tintColor = .gray
         return imageView
     }()
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [mainLabel, arrowImageView])
+        stackView.axis = .horizontal
+        stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
     }()
+    
+    // MARK: - Init
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Public Methods
     

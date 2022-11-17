@@ -15,7 +15,8 @@ This module has 4 dependencies:
 - `Common` to inherit logic from `BaseRecipes` from [Common](https://github.com/iCookbook/Common) module
 - `CommonUI` for some reasons:
     * Image loader in `UIImageView`
-    * Identifier for the cells
+    * Cells identifiers
+    * `TitleHeaderTableView` class
 - `Models` to use data models
 - `Networking` to fetch recipes from the server
 - `Resources` for access to resources of the application

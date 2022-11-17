@@ -95,6 +95,7 @@ final class SearchViewController: BaseRecipesViewController {
     /// When user tapps on a category or searching something, we need to display activity indicator and hide table view with all titles.
     private func handleViewOnSearching() {
         activityIndicator.startAnimating()
+        hideHistoryTableView()
         
         categoriesTitleLabel.text = nil
         recommendedTitleLabel.text = nil
@@ -169,6 +170,22 @@ final class SearchViewController: BaseRecipesViewController {
             activityIndicator.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
     }
+    
+    private func showHistoryTableView() {
+        contentView.addSubview(searchRequestsHistoryTableView)
+//        contentView.bringSubviewToFront(searchRequestsHistoryTableView)
+        
+        NSLayoutConstraint.activate([
+            searchRequestsHistoryTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            searchRequestsHistoryTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            searchRequestsHistoryTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            searchRequestsHistoryTableView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+        ])
+    }
+    
+    private func hideHistoryTableView() {
+        searchRequestsHistoryTableView.removeFromSuperview()
+    }
 }
 
 // MARK: - SearchViewInput
@@ -180,6 +197,11 @@ extension SearchViewController: SearchViewInput {
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         searchRequestsTableViewDataSource.fillInData(searchRequestsHistory: searchRequestsHistory)
     }
+    
+    /// Clears search requests history from data source.
+    func didClearedSearchRequestsHistory() {
+        searchRequestsTableViewDataSource.clearData()
+    }
 }
 
 // MARK: - UISearchBarDelegate
@@ -187,12 +209,13 @@ extension SearchViewController: SearchViewInput {
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        // TODO: Implement opening table view with `searchRequestsHistory`
+        showHistoryTableView()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
         searchBar.resignFirstResponder()
+        hideHistoryTableView()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -272,6 +295,11 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
         presenter.searchBarButtonClicked(with: keyword)
         
         handleViewOnSearching()
+    }
+    
+    func clearHistoryButtonTapped() {
+        guard let presenter = presenter as? SearchViewOutput else { return }
+        presenter.clearSearchRequestsHistory()
     }
 }
 

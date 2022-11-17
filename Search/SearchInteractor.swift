@@ -19,6 +19,12 @@ extension SearchInteractor: SearchInteractorInput {
         presenter.didProvidedSearchRequestsHistory(UserDefaults.searchRequestsHistory)
     }
     
+    func clearSearchRequestsHistory() {
+        UserDefaults.searchRequestsHistory = []
+        guard let presenter = presenter as? SearchInteractorOutput else { return }
+        presenter.didClearedSearchRequestsHistory()
+    }
+    
     func requestRandomData(by category: Cuisine) {
         let endpoint = Endpoint.random(by: category)
         let request = NetworkRequest(endpoint: endpoint)
@@ -33,8 +39,10 @@ extension SearchInteractor: SearchInteractorInput {
     }
     
     func requestData(by keyword: String) {
-        /// Adds new keyword to the search history.
-        UserDefaults.searchRequestsHistory.append(keyword)
+        /// Adds new keyword to the search history only if it is not in the array already.
+        if !UserDefaults.searchRequestsHistory.contains(keyword) {
+            UserDefaults.searchRequestsHistory.append(keyword)
+        }
         
         let endpoint = Endpoint.create(by: keyword)
         let request = NetworkRequest(endpoint: endpoint)

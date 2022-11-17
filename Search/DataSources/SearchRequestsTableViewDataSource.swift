@@ -7,13 +7,21 @@
 
 import UIKit
 import Models
+import CommonUI
+import Resources
 
 protocol SearchRequestsTableViewDataSourceDelegate: AnyObject {
     /// Method to provide data to the view controller.
     /// - Parameter keyword: data to provide.
     func didSelectRowWith(keyword: String)
+    
+    /// Handle clear history button tapping.
+    func clearHistoryButtonTapped()
 }
 
+/// Class implementing `UITableViewDelegate` and `UITableViewDataSource` protocols.
+///
+/// We need to use them, because we have 2 table view on the view controller. So not to handle what table view is, this class responsible for all table view working.
 final class SearchRequestsTableViewDataSource: NSObject {
     
     /// Link to the view controller to provide delegate methods.
@@ -34,7 +42,13 @@ final class SearchRequestsTableViewDataSource: NSObject {
     public func clearData() {
         searchRequestsHistory = []
     }
+    
+    @objc public func clearHistoryButtonTapped() {
+        view?.clearHistoryButtonTapped()
+    }
 }
+
+// MARK: - UITableViewDelegate, UITableViewDataSource
 
 extension SearchRequestsTableViewDataSource: UITableViewDelegate, UITableViewDataSource {
     
@@ -48,5 +62,25 @@ extension SearchRequestsTableViewDataSource: UITableViewDelegate, UITableViewDat
         }
         cell.configure(title: searchRequestsHistory[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        view?.didSelectRowWith(keyword: searchRequestsHistory[indexPath.row])
+    }
+    
+    // MARK: Header
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TitleTableViewHeader.identifier) as? TitleTableViewHeader else {
+            fatalError("Could not cast table view header to `TitleTableViewHeader` for section: \(section)")
+        }
+        header.configure(title: Texts.Search.recent)
+        return header
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        36
     }
 }

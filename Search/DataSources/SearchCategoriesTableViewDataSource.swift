@@ -14,6 +14,9 @@ protocol SearchCategoriesTableViewDataSourceDelegate: AnyObject {
     func didSelectRowWith(category: Cuisine)
 }
 
+/// Class implementing `UITableViewDelegate` and `UITableViewDataSource` protocols.
+///
+/// We need to use them, because we have 2 table view on the view controller. So not to handle what table view is, this class responsible for all table view working.
 final class SearchCategoriesTableViewDataSource: NSObject {
     
     /// Link to the view controller to provide delegate methods.
@@ -37,6 +40,8 @@ final class SearchCategoriesTableViewDataSource: NSObject {
         categories.isEmpty
     }
 }
+
+// MARK: - UITableViewDelegate, UITableViewDataSource
 
 extension SearchCategoriesTableViewDataSource: UITableViewDelegate, UITableViewDataSource {
     

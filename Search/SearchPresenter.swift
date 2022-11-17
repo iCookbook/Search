@@ -23,6 +23,11 @@ extension SearchPresenter: SearchViewOutput {
         }
     }
     
+    func clearSearchRequestsHistory() {
+        guard let interactor = interactor as? SearchInteractorInput else { return }
+        interactor.clearSearchRequestsHistory()
+    }
+    
     func categoryDidTapped(_ category: Cuisine) {
         guard let interactor = interactor as? SearchInteractorInput else { return }
         
@@ -45,5 +50,10 @@ extension SearchPresenter: SearchInteractorOutput {
     func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         guard let view = view as? SearchViewInput else { return }
         view.fillInSearchRequestsHistory(searchRequestsHistory)
+    }
+    
+    func didClearedSearchRequestsHistory() {
+        guard let view = view as? SearchViewInput else { return }
+        view.didClearedSearchRequestsHistory()
     }
 }
