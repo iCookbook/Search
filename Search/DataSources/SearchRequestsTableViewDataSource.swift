@@ -10,12 +10,13 @@ import Models
 import CommonUI
 import Resources
 
+/// Delegate protocol for ``SearchRequestsTableViewDataSource``.
 protocol SearchRequestsTableViewDataSourceDelegate: AnyObject {
-    /// Method to provide data to the view controller.
+    /// Provides data to the view controller.
     /// - Parameter keyword: data to provide.
     func didSelectRowWith(keyword: String)
     
-    /// Handle clear history button tapping.
+    /// Handles clear history button tapping.
     func clearHistoryButtonTapped()
 }
 

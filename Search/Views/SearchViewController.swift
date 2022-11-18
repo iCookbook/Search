@@ -24,6 +24,7 @@ final class SearchViewController: BaseRecipesViewController {
         searchController.searchBar.showsBookmarkButton = true
         searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
         searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .highlighted) // .normal
+        searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
         return searchController
     }()
@@ -68,7 +69,7 @@ final class SearchViewController: BaseRecipesViewController {
         let tableView = NonScrollableTableView()
         tableView.delegate = searchRequestsTableViewDataSource
         tableView.dataSource = searchRequestsTableViewDataSource
-        tableView.estimatedRowHeight = 44
+        tableView.rowHeight = 44
         tableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: HistoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
@@ -95,6 +96,8 @@ final class SearchViewController: BaseRecipesViewController {
     /// When user tapps on a category or searching something, we need to display activity indicator and hide table view with all titles.
     private func handleViewOnSearching() {
         activityIndicator.startAnimating()
+        hideHistoryTableView()
+        recipesCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         
         categoriesTitleLabel.text = nil
         recommendedTitleLabel.text = nil
@@ -116,6 +119,7 @@ final class SearchViewController: BaseRecipesViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         title = Texts.Search.title
         view.backgroundColor = Colors.systemBackground
+        definesPresentationContext = true
         
         searchRequestsTableViewDataSource.delegate = self
         categoriesTableViewDataSource.delegate = self
@@ -211,6 +215,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
         hideHistoryTableView()
     }
     
@@ -221,9 +226,10 @@ extension SearchViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         guard let presenter = presenter as? SearchViewOutput,
-              let keyword = searchBar.text
+              let keyword = searchBar.text, !keyword.isEmpty
         else { return }
         
+        searchBar.resignFirstResponder()
         presenter.searchBarButtonClicked(with: keyword)
         presenter.fetchSearchRequestsHistory()
         handleViewOnSearching()
@@ -302,6 +308,7 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
         presenter.searchBarButtonClicked(with: keyword)
         
         searchController.searchBar.text = keyword
+        searchController.searchBar.resignFirstResponder()
         handleViewOnSearching()
     }
     
@@ -320,6 +327,6 @@ extension SearchViewController: FilterDelegateProtocol {
 extension SearchViewController {
     /// Keywords to show in placeholder of search bar.
     var keywords: [String] {
-        ["chicken", "beef", "mushroom", "cheese", "pepperoni", "pepper", "garlic", "basil", "onion", "salami", "bacon", "shrimps", "fish", "anchovies", "pepper", "olives", "meat", "veal", "lamb", "meatballs", "turkey"]
+        ["chicken", "beef", "mushroom", "cheese", "pepperoni", "garlic", "basil", "onion", "salami", "bacon", "shrimps", "fish", "anchovies", "pepper", "olives", "meat", "veal", "lamb", "meatballs", "turkey"]
     }
 }
