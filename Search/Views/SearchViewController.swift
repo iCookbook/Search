@@ -70,6 +70,8 @@ final class SearchViewController: BaseRecipesViewController {
         tableView.delegate = searchRequestsTableViewDataSource
         tableView.dataSource = searchRequestsTableViewDataSource
         tableView.rowHeight = 44
+        tableView.isScrollEnabled = true
+        tableView.bounces = false
         tableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: HistoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
@@ -175,13 +177,13 @@ final class SearchViewController: BaseRecipesViewController {
     }
     
     private func showHistoryTableView() {
-        contentView.addSubview(searchRequestsHistoryTableView)
+        view.addSubview(searchRequestsHistoryTableView)
         
         NSLayoutConstraint.activate([
-            searchRequestsHistoryTableView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            searchRequestsHistoryTableView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            searchRequestsHistoryTableView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            searchRequestsHistoryTableView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            searchRequestsHistoryTableView.topAnchor.constraint(equalTo: searchController.searchBar.bottomAnchor),
+            searchRequestsHistoryTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            searchRequestsHistoryTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            searchRequestsHistoryTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
     
@@ -195,14 +197,23 @@ final class SearchViewController: BaseRecipesViewController {
 extension SearchViewController: SearchViewInput {
     
     /// Provides search requests history to the data source.
+    ///
     /// - Parameter searchRequestsHistory: search requests history from UserDefaults.
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         searchRequestsTableViewDataSource.fillInData(searchRequestsHistory: searchRequestsHistory)
+        
+        DispatchQueue.main.async {
+            self.searchRequestsHistoryTableView.reloadData()
+        }
     }
     
     /// Clears search requests history from data source.
     func didClearedSearchRequestsHistory() {
         searchRequestsTableViewDataSource.clearData()
+        
+        DispatchQueue.main.async {
+            self.searchRequestsHistoryTableView.reloadData()
+        }
     }
 }
 
@@ -293,6 +304,7 @@ extension SearchViewController {
 extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, SearchRequestsTableViewDataSourceDelegate {
     
     /// Delegate method from ``SearchCategoriesTableViewDataSourceDelegate`` to handle tapping on a random category.
+    ///
     /// - Parameter data: provided data from tapped row.
     func didSelectRowWith(category: Cuisine) {
         guard let presenter = presenter as? SearchViewOutput else { return }
@@ -302,6 +314,7 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
     }
     
     /// Delegate method from ``SearchRequestsTableViewDataSourceDelegate`` to handle tapping on a keyword from requests history.
+    ///
     /// - Parameter keyword: keyword to search.
     func didSelectRowWith(keyword: String) {
         guard let presenter = presenter as? SearchViewOutput else { return }
@@ -312,6 +325,7 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
         handleViewOnSearching()
     }
     
+    /// Handles tapping on the clear history button.
     func clearHistoryButtonTapped() {
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.clearSearchRequestsHistory()

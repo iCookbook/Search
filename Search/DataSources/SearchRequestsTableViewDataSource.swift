@@ -35,6 +35,9 @@ final class SearchRequestsTableViewDataSource: NSObject {
     
     // MARK: - Public Methods
     
+    /// Fulfills data for this data source.
+    ///
+    /// - Parameter categories: data to fill in.
     public func fillInData(searchRequestsHistory: [String]) {
         self.searchRequestsHistory = searchRequestsHistory
     }

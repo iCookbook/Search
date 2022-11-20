@@ -15,9 +15,11 @@ extension SearchPresenter: SearchModuleInput {
 }
 
 extension SearchPresenter: SearchViewOutput {
+    
     func fetchSearchRequestsHistory() {
         guard let interactor = interactor as? SearchInteractorInput else { return }
         
+        #warning("А точно ли результат этого кода успевает вернуться во view?")
         DispatchQueue.global(qos: .utility).async {
             interactor.provideSearchRequestsHistory()
         }
@@ -28,6 +30,9 @@ extension SearchPresenter: SearchViewOutput {
         interactor.clearSearchRequestsHistory()
     }
     
+    /// Handles tapping on a category in `categoriesTableView`.
+    ///
+    /// - Parameter category: the `Сategory` that the user has selected.
     func categoryDidTapped(_ category: Cuisine) {
         guard let interactor = interactor as? SearchInteractorInput else { return }
         

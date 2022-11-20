@@ -8,8 +8,10 @@
 import UIKit
 import Models
 
+/// Delegate protocol for ``SearchCategoriesTableViewDataSource``.
 protocol SearchCategoriesTableViewDataSourceDelegate: AnyObject {
     /// Method to provide data to the view controller.
+    /// 
     /// - Parameter category: data to provide.
     func didSelectRowWith(category: Cuisine)
 }
@@ -24,18 +26,26 @@ final class SearchCategoriesTableViewDataSource: NSObject {
     
     // MARK: - Private Properties
     
+    /// Data for this data source.
     private var categories = [Cuisine]()
     
     // MARK: - Public Methods
     
+    /// Fulfills data for this data source.
+    ///
+    /// - Parameter categories: data to fill in.
     public func fillInData(categories: [Cuisine]) {
         self.categories = categories
     }
     
+    /// Clears all data by setting empty array for data.
     public func clearData() {
         categories = []
     }
     
+    /// Checks whether data is empty or not.
+    ///
+    /// - Returns: A boolean value indicating whether the collection is empty.
     public func isEmpty() -> Bool {
         categories.isEmpty
     }
