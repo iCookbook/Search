@@ -74,6 +74,7 @@ final class SearchViewController: BaseRecipesViewController {
         tableView.isScrollEnabled = true
         tableView.bounces = false
         tableView.alpha = 0
+        tableView.layer.zPosition = 2
         tableView.backgroundColor = Colors.systemBackground
         tableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: HistoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)

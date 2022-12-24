@@ -38,5 +38,3 @@ They implement the delegate methods and use the view reference to pass the deleg
 
 - `SearchCategoriesTableViewDataSourceDelegate`
 - `SearchRequestsTableViewDataSourceDelegate`
-
-Delegate methods
