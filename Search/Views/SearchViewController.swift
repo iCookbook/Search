@@ -20,12 +20,12 @@ final class SearchViewController: BaseRecipesViewController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.placeholder = keywords.randomElement()?.capitalized
         searchController.searchBar.sizeToFit()
-        searchController.delegate = self
         searchController.searchBar.delegate = self
         searchController.searchBar.showsBookmarkButton = true
         searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
         searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .highlighted) // .normal
-        searchController.hidesNavigationBarDuringPresentation = true
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
         return searchController
     }()
     
@@ -48,11 +48,13 @@ final class SearchViewController: BaseRecipesViewController {
     private let categoriesTitleLabel = TitleLabel(text: Texts.Search.cuisines)
     private let recommendedTitleLabel = TitleLabel(text: Texts.Search.recommended)
     
+    private let categoriesTableViewDataSource = SearchCategoriesTableViewDataSource()
     private lazy var categoriesTableView: UITableView = {
-        let tableView = NonScrollableTableView()
-        tableView.delegate = self
-        tableView.dataSource = self
+        let tableView = TableView()
+        tableView.delegate = categoriesTableViewDataSource
+        tableView.dataSource = categoriesTableViewDataSource
         tableView.estimatedRowHeight = 44
+        tableView.layer.zPosition = 1
         tableView.register(CategoryTableViewCell.self, forCellReuseIdentifier: CategoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
@@ -63,9 +65,48 @@ final class SearchViewController: BaseRecipesViewController {
     private lazy var recommendedTitleLabelTopAnchor = NSLayoutConstraint(item: recommendedTitleLabel, attribute: .top, relatedBy: .equal, toItem: categoriesTableView, attribute: .bottom, multiplier: 1, constant: 12)
     private lazy var recipesCollectionViewTopAnchor = NSLayoutConstraint(item: recipesCollectionView, attribute: .top, relatedBy: .equal, toItem: recommendedTitleLabel, attribute: .bottom, multiplier: 1, constant: 8)
     
-    /// This code choose 5 categories randomly.
-    private let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
-    private lazy var categories: [Cuisine] = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
+    private let searchRequestsTableViewDataSource = SearchRequestsTableViewDataSource()
+    private lazy var searchRequestsHistoryTableView: UITableView = {
+        let tableView = TableView()
+        tableView.delegate = searchRequestsTableViewDataSource
+        tableView.dataSource = searchRequestsTableViewDataSource
+        tableView.rowHeight = 44
+        tableView.isScrollEnabled = true
+        tableView.bounces = false
+        tableView.alpha = 0
+        tableView.layer.zPosition = 2
+        tableView.backgroundColor = Colors.systemBackground
+        tableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: HistoryTableViewCell.identifier)
+        tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
+        return tableView
+    }()
+    
+    private let offlineTitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = Fonts.errorTitle()
+        label.text = Texts.Search.offlineModeTitle
+        return label
+    }()
+    
+    private let offlineSubitleLabel: UILabel = {
+        let label = UILabel()
+        label.font = Fonts.smallMedium()
+        label.textColor = Colors.secondaryLabel
+        label.text = Texts.Search.offlineModeDescription
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    private lazy var offlineStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [offlineTitleLabel, offlineSubitleLabel])
+        stackView.axis = .vertical
+        stackView.spacing = 16
+        stackView.layer.zPosition = 1
+        stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
     
     // MARK: - Life Cycle
     
@@ -74,31 +115,43 @@ final class SearchViewController: BaseRecipesViewController {
         
         setupView()
         
-        guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.requestRandomData()
+        guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.fetchSearchRequestsHistory()
     }
     
     override func turnOnOfflineMode() {
-        // TODO: Implement offline mode
+        view.addSubview(offlineStackView)
+        categoriesTableView.removeFromSuperview()
+        categoriesTitleLabel.removeFromSuperview()
+        recommendedTitleLabel.removeFromSuperview()
+        
+        NSLayoutConstraint.activate([
+            offlineStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.layoutMargins.left),
+            offlineStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -view.layoutMargins.right),
+            offlineStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            offlineStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+        ])
     }
     
     // MARK: - Private Methods
     
     /// When user tapps on a category or searching something, we need to display activity indicator and hide table view with all titles.
-    private func handleViewOnUpdatingData() {
+    private func handleViewOnSearching() {
         activityIndicator.startAnimating()
+        hideHistoryTableView()
         
         categoriesTitleLabel.text = nil
         recommendedTitleLabel.text = nil
-        categories = []
+        
+        categoriesTableViewDataSource.clearData()
         categoriesTableView.reloadData()
         
-        UIView.animate(withDuration: 1.0, delay: 0.0, options: [.transitionFlipFromBottom, .curveEaseOut], animations: { [unowned self] in
-            categoriesTableViewTopAnchor.constant = 0
-            recommendedTitleLabelTopAnchor.constant = 0
-            recipesCollectionViewTopAnchor.constant = 0
-            view.layoutIfNeeded()
+        UIView.animate(withDuration: 1.4, delay: 0.2, usingSpringWithDamping: 0.8, initialSpringVelocity: 1.5, options: .allowUserInteraction, animations: {
+            self.categoriesTableViewTopAnchor.constant = 0
+            self.recommendedTitleLabelTopAnchor.constant = 0
+            self.recipesCollectionViewTopAnchor.constant = 0
+            self.view.layoutIfNeeded()
         })
     }
     
@@ -108,6 +161,14 @@ final class SearchViewController: BaseRecipesViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         title = Texts.Search.title
         view.backgroundColor = Colors.systemBackground
+        definesPresentationContext = true
+        
+        searchRequestsTableViewDataSource.delegate = self
+        categoriesTableViewDataSource.delegate = self
+        /// This code choose 5 categories randomly.
+        let randomIndex = Int.random(in: 0..<Cuisine.cuisines.count - 5)
+        let categories = Array(Cuisine.cuisines.shuffled()[randomIndex..<randomIndex + 5])
+        categoriesTableViewDataSource.fillInData(categories: categories)
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -154,37 +215,92 @@ final class SearchViewController: BaseRecipesViewController {
             activityIndicator.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
     }
+    
+    private func showHistoryTableView() {
+        view.addSubview(searchRequestsHistoryTableView)
+        
+        NSLayoutConstraint.activate([
+            searchRequestsHistoryTableView.topAnchor.constraint(equalTo: searchController.searchBar.bottomAnchor),
+            searchRequestsHistoryTableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            searchRequestsHistoryTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            searchRequestsHistoryTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        UIView.animate(withDuration: 0.4, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
+            self.searchRequestsHistoryTableView.alpha = 1
+        }
+    }
+    
+    private func hideHistoryTableView() {
+        UIView.animate(withDuration: 0.4, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
+            self.searchRequestsHistoryTableView.alpha = 0
+        } completion: { isFinished in
+            self.searchRequestsHistoryTableView.removeFromSuperview()
+        }
+    }
 }
 
 // MARK: - SearchViewInput
 
 extension SearchViewController: SearchViewInput {
     
+    /// Provides search requests history to the data source.
+    ///
+    /// - Parameter searchRequestsHistory: search requests history from UserDefaults.
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
-//        self.searchRequestsHistory = searchRequestsHistory
+        searchRequestsTableViewDataSource.fillInData(searchRequestsHistory: searchRequestsHistory)
+        
+        DispatchQueue.main.async {
+            self.searchRequestsHistoryTableView.reloadData()
+        }
+    }
+    
+    /// Clears search requests history from data source.
+    func didClearedSearchRequestsHistory() {
+        searchRequestsTableViewDataSource.clearData()
+        
+        DispatchQueue.main.async {
+            self.searchRequestsHistoryTableView.reloadData()
+        }
     }
 }
 
-// MARK: - UISearchBarDelegate, UISearchControllerDelegate
+// MARK: - UISearchBarDelegate
 
-extension SearchViewController: UISearchBarDelegate, UISearchControllerDelegate {
+extension SearchViewController: UISearchBarDelegate {
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        showHistoryTableView()
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        hideHistoryTableView()
+    }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = nil
         searchBar.resignFirstResponder()
+        searchBar.text = nil
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let presenter = presenter as? SearchViewOutput,
-              let keyword = searchBar.text
-        else { return }
+        searchBar.resignFirstResponder()
         
-        presenter.searchBarButtonClicked(with: keyword)
-        handleViewOnUpdatingData()
+        guard let presenter = presenter as? SearchViewOutput,
+              let keyword = searchBar.text, !keyword.isEmpty else { return }
+        
+        presenter.requestData(by: keyword)
+        presenter.fetchSearchRequestsHistory()
+        handleViewOnSearching()
     }
     
     func searchBarBookmarkButtonClicked(_ searchBar: UISearchBar) {
-        // TODO: Open filter view controller
+        let filterViewController = UINavigationController(rootViewController: FilterViewController(delegate: self))
+        
+        if #available(iOS 15.0, *),
+           let sheet = filterViewController.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+        }
+        present(filterViewController, animated: true)
     }
 }
 
@@ -198,17 +314,15 @@ extension SearchViewController {
         /// 2. Categories table view was hidden;
         /// 3. Check for the end of the collection (scroll) view.
         if (recipesCollectionView.contentSize.height != 0 &&
-            categories.isEmpty &&
+            categoriesTableViewDataSource.isEmpty() &&
             scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
+            
             /// Fetcing should not be in progress and there should be valid next page url.
             guard !isFetchingInProgress,
                   let nextPageUrl = nextPageUrl else { return }
             
             isFetchingInProgress = true
-            /// Because it is _event handling_, we need to use `userInteractive` quality of service.
-            DispatchQueue.global(qos: .userInteractive).async {
-                self.presenter.requestData(urlString: nextPageUrl)
-            }
+            presenter.requestData(urlString: nextPageUrl)
         }
     }
     
@@ -221,7 +335,7 @@ extension SearchViewController {
                 fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
             }
             /// If there is link to the next page and there is no categories start loading.
-            if nextPageUrl != nil && categories.isEmpty {
+            if nextPageUrl != nil && categoriesTableViewDataSource.isEmpty() {
                 footer.startActivityIndicator()
             }
         default:
@@ -230,34 +344,48 @@ extension SearchViewController {
     }
 }
 
-// MARK: - Table View
+// MARK: - Table View Data Sources delegates
 
-extension SearchViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        categories.count
-    }
+extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, SearchRequestsTableViewDataSourceDelegate {
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: CategoryTableViewCell.identifier, for: indexPath) as? CategoryTableViewCell else {
-            fatalError("Could not cast table view cell to `CategoryTableViewCell` for indexPath: \(indexPath)")
-        }
-        cell.configure(category: categories[indexPath.row])
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        
+    /// Delegate method from ``SearchCategoriesTableViewDataSourceDelegate`` to handle tapping on a random category.
+    ///
+    /// - Parameter data: provided data from tapped row.
+    func didSelectRowWith(category: Cuisine) {
         guard let presenter = presenter as? SearchViewOutput else { return }
-        presenter.categoryDidTapped(categories[indexPath.row])
-        activityIndicator.startAnimating()
-        handleViewOnUpdatingData()
+        presenter.categoryDidTapped(category)
+        
+        handleViewOnSearching()
     }
+    
+    /// Delegate method from ``SearchRequestsTableViewDataSourceDelegate`` to handle tapping on a keyword from requests history.
+    ///
+    /// - Parameter keyword: keyword to search.
+    func didSelectRowWith(keyword: String) {
+        guard let presenter = presenter as? SearchViewOutput else { return }
+        presenter.requestData(by: keyword)
+        
+        searchController.searchBar.text = keyword
+        searchController.searchBar.resignFirstResponder()
+        handleViewOnSearching()
+    }
+    
+    /// Handles tapping on the clear history button.
+    func clearHistoryButtonTapped() {
+        guard let presenter = presenter as? SearchViewOutput else { return }
+        presenter.clearSearchRequestsHistory()
+    }
+}
+
+// MARK: - FilterDelegateProtocol
+
+extension SearchViewController: FilterDelegateProtocol {
+    
 }
 
 extension SearchViewController {
     /// Keywords to show in placeholder of search bar.
     var keywords: [String] {
-        ["chicken", "beef", "mushroom", "cheese", "pepperoni", "pepper", "garlic", "basil", "onion", "salami", "bacon", "shrimps", "fish", "anchovies", "pepper", "olives", "meat", "veal", "lamb", "meatballs", "turkey"]
+        ["chicken", "beef", "mushroom", "cheese", "pepperoni", "garlic", "basil", "onion", "salami", "bacon", "shrimps", "fish", "anchovies", "pepper", "olives", "meat", "veal", "lamb", "meatballs", "turkey"]
     }
 }

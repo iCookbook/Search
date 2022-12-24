@@ -15,25 +15,49 @@ extension SearchPresenter: SearchModuleInput {
 }
 
 extension SearchPresenter: SearchViewOutput {
+    
     func fetchSearchRequestsHistory() {
         guard let interactor = interactor as? SearchInteractorInput else { return }
-        interactor.provideSearchRequestsHistory()
+        
+        DispatchQueue.global(qos: .utility).async {
+            interactor.provideSearchRequestsHistory()
+        }
     }
     
+    func clearSearchRequestsHistory() {
+        guard let interactor = interactor as? SearchInteractorInput else { return }
+        interactor.clearSearchRequestsHistory()
+    }
+    
+    /// Handles tapping on a category in `categoriesTableView`.
+    ///
+    /// - Parameter category: the `Сategory` that the user has selected.
     func categoryDidTapped(_ category: Cuisine) {
         guard let interactor = interactor as? SearchInteractorInput else { return }
-        interactor.requestRandomData(by: category)
+        
+        DispatchQueue.global(qos: .userInteractive).async {
+            interactor.requestRandomData(by: category)
+        }
     }
     
-    func searchBarButtonClicked(with text: String) {
+    func requestData(by keyword: String) {
         guard let interactor = interactor as? SearchInteractorInput else { return }
-        interactor.requestData(by: text)
+        
+        DispatchQueue.global(qos: .userInteractive).async {
+            interactor.requestData(by: keyword)
+        }
     }
 }
 
 extension SearchPresenter: SearchInteractorOutput {
+    
     func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         guard let view = view as? SearchViewInput else { return }
         view.fillInSearchRequestsHistory(searchRequestsHistory)
+    }
+    
+    func didClearedSearchRequestsHistory() {
+        guard let view = view as? SearchViewInput else { return }
+        view.didClearedSearchRequestsHistory()
     }
 }

@@ -16,24 +16,28 @@ public protocol SearchModuleOutput: BaseRecipesModuleOutput {
 
 protocol SearchViewInput: BaseRecipesViewInput {
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String])
+    func didClearedSearchRequestsHistory()
 }
 
 protocol SearchViewOutput: BaseRecipesViewOutput {
     func fetchSearchRequestsHistory()
-    func categoryDidTapped(_ category: Cuisine)
+    func clearSearchRequestsHistory()
     
-    func searchBarButtonClicked(with text: String)
+    func categoryDidTapped(_ category: Cuisine)
+    func requestData(by keyword: String)
 }
 
 protocol SearchInteractorInput: BaseRecipesInteractorInput {
     func provideSearchRequestsHistory()
-    func requestRandomData(by category: Cuisine)
+    func clearSearchRequestsHistory()
     
+    func requestRandomData(by category: Cuisine)
     func requestData(by keyword: String)
 }
 
 protocol SearchInteractorOutput: BaseRecipesInteractorOutput {
     func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String])
+    func didClearedSearchRequestsHistory()
 }
 
 protocol SearchRouterInput: BaseRecipesRouterInput {

@@ -17,6 +17,7 @@ final class CategoryTableViewCell: UITableViewCell {
         let label = UILabel()
         label.font = Fonts.body()
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -32,6 +33,12 @@ final class CategoryTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Public Methods
+    
+    public func configure(category: Cuisine) {
+        mainLabel.text = "\(category.emoji)  \(category.rawValue.localized)"
+    }
+    
     // MARK: - Private Methods
     
     private func setupView() {
@@ -43,11 +50,5 @@ final class CategoryTableViewCell: UITableViewCell {
             mainLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: contentView.layoutMargins.top * 1.5),
             mainLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -contentView.layoutMargins.bottom * 1.5),
         ])
-    }
-    
-    // MARK: - Public Methods
-    
-    public func configure(category: Cuisine) {
-        mainLabel.text = "\(category.emoji)  \(category.rawValue.localized)"
     }
 }
