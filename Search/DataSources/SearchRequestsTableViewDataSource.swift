@@ -80,11 +80,8 @@ extension SearchRequestsTableViewDataSource: UITableViewDelegate, UITableViewDat
         guard let header = tableView.dequeueReusableHeaderFooterView(withIdentifier: TitleTableViewHeader.identifier) as? TitleTableViewHeader else {
             fatalError("Could not cast table view header to `TitleTableViewHeader` for section: \(section)")
         }
-        header.configure(title: Texts.Search.recent, buttonTitle: Texts.Search.clear)
+        header.configure(title: Texts.Search.recent)
+        header.addButton(buttonTitle: Texts.Search.clear, selector: #selector(clearHistoryButtonTapped))
         return header
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        36
     }
 }

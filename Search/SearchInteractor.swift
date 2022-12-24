@@ -34,10 +34,10 @@ extension SearchInteractor: SearchInteractorInput {
         let endpoint = Endpoint.random(by: category)
         let request = NetworkRequest(endpoint: endpoint)
         
-        networkManager.getResponse(request: request) { [unowned self] (result) in
+        networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
             switch result {
             case .success(let response):
-                presenter?.didProvidedResponse(response, withOverridingCurrentData: true)
+                setImageData(for: response, withOverridingCurrentData: true)
             case .failure(let error):
                 presenter?.handleError(error)
             }
@@ -56,10 +56,10 @@ extension SearchInteractor: SearchInteractorInput {
         let endpoint = Endpoint.create(by: keyword)
         let request = NetworkRequest(endpoint: endpoint)
         
-        networkManager.getResponse(request: request) { [unowned self] (result) in
+        networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
             switch result {
             case .success(let response):
-                presenter?.didProvidedResponse(response, withOverridingCurrentData: true)
+                setImageData(for: response, withOverridingCurrentData: true)
             case .failure(let error):
                 presenter?.handleError(error)
             }

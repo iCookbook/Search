@@ -50,7 +50,7 @@ final class SearchViewController: BaseRecipesViewController {
     
     private let categoriesTableViewDataSource = SearchCategoriesTableViewDataSource()
     private lazy var categoriesTableView: UITableView = {
-        let tableView = NonScrollableTableView()
+        let tableView = TableView()
         tableView.delegate = categoriesTableViewDataSource
         tableView.dataSource = categoriesTableViewDataSource
         tableView.estimatedRowHeight = 44
@@ -66,12 +66,15 @@ final class SearchViewController: BaseRecipesViewController {
     
     private let searchRequestsTableViewDataSource = SearchRequestsTableViewDataSource()
     private lazy var searchRequestsHistoryTableView: UITableView = {
-        let tableView = NonScrollableTableView()
+        let tableView = TableView()
         tableView.delegate = searchRequestsTableViewDataSource
         tableView.dataSource = searchRequestsTableViewDataSource
         tableView.rowHeight = 44
+//        tableView.sectionHeaderHeight = 36
+//        tableView.estimatedSectionHeaderHeight = 36
         tableView.isScrollEnabled = true
         tableView.bounces = false
+        tableView.backgroundColor = Colors.systemBackground
         tableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: HistoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
         return tableView
@@ -99,6 +102,7 @@ final class SearchViewController: BaseRecipesViewController {
     private func handleViewOnSearching() {
         activityIndicator.startAnimating()
         hideHistoryTableView()
+        // TODO: Fix
         recipesCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         
         categoriesTitleLabel.text = nil
@@ -189,6 +193,16 @@ final class SearchViewController: BaseRecipesViewController {
     
     private func hideHistoryTableView() {
         searchRequestsHistoryTableView.removeFromSuperview()
+        UIView.animate(withDuration: 0.7, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
+//            self.searchRequestsHistoryTableView.alpha = 0
+//            self.searchRequestsHistoryTableView.removeFromSuperview()
+        } completion: { isFinished in
+//            self.searchRequestsHistoryTableView.removeFromSuperview()
+            if isFinished {
+//                self.searchRequestsHistoryTableView.removeFromSuperview()
+            }
+        }
+
     }
 }
 
@@ -231,17 +245,17 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = nil
         searchBar.resignFirstResponder()
+        searchBar.text = nil
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        guard let presenter = presenter as? SearchViewOutput,
-              let keyword = searchBar.text, !keyword.isEmpty
-        else { return }
-        
         searchBar.resignFirstResponder()
-        presenter.searchBarButtonClicked(with: keyword)
+        
+        guard let presenter = presenter as? SearchViewOutput,
+              let keyword = searchBar.text, !keyword.isEmpty else { return }
+        
+        presenter.requestData(by: keyword)
         presenter.fetchSearchRequestsHistory()
         handleViewOnSearching()
     }
@@ -269,15 +283,13 @@ extension SearchViewController {
         if (recipesCollectionView.contentSize.height != 0 &&
             categoriesTableViewDataSource.isEmpty() &&
             scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
+            
             /// Fetcing should not be in progress and there should be valid next page url.
             guard !isFetchingInProgress,
                   let nextPageUrl = nextPageUrl else { return }
             
             isFetchingInProgress = true
-            /// Because it is _event handling_, we need to use `userInteractive` quality of service.
-            DispatchQueue.global(qos: .userInteractive).async {
-                self.presenter.requestData(urlString: nextPageUrl)
-            }
+            presenter.requestData(urlString: nextPageUrl)
         }
     }
     
@@ -318,7 +330,7 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
     /// - Parameter keyword: keyword to search.
     func didSelectRowWith(keyword: String) {
         guard let presenter = presenter as? SearchViewOutput else { return }
-        presenter.searchBarButtonClicked(with: keyword)
+        presenter.requestData(by: keyword)
         
         searchController.searchBar.text = keyword
         searchController.searchBar.resignFirstResponder()

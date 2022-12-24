@@ -24,7 +24,7 @@ protocol SearchViewOutput: BaseRecipesViewOutput {
     func clearSearchRequestsHistory()
     
     func categoryDidTapped(_ category: Cuisine)
-    func searchBarButtonClicked(with text: String)
+    func requestData(by keyword: String)
 }
 
 protocol SearchInteractorInput: BaseRecipesInteractorInput {
