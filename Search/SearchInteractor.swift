@@ -53,6 +53,9 @@ extension SearchInteractor: SearchInteractorInput {
             UserDefaults.searchRequestsHistory.append(keyword)
         }
         
+        guard let presenter = presenter as? SearchInteractorOutput else { return }
+        presenter.didProvidedSearchRequestsHistory(UserDefaults.searchRequestsHistory)
+        
         let endpoint = Endpoint.create(by: keyword)
         let request = NetworkRequest(endpoint: endpoint)
         
@@ -61,7 +64,7 @@ extension SearchInteractor: SearchInteractorInput {
             case .success(let response):
                 setImageData(for: response, withOverridingCurrentData: true)
             case .failure(let error):
-                presenter?.handleError(error)
+                presenter.handleError(error)
             }
         }
     }

@@ -18,11 +18,10 @@ extension SearchPresenter: SearchViewOutput {
     
     func fetchSearchRequestsHistory() {
         guard let interactor = interactor as? SearchInteractorInput else { return }
-        #warning("А точно ли результат этого кода успевает вернуться во view?")
+        
         DispatchQueue.global(qos: .utility).async {
-//            interactor.provideSearchRequestsHistory()
+            interactor.provideSearchRequestsHistory()
         }
-        interactor.provideSearchRequestsHistory()
     }
     
     func clearSearchRequestsHistory() {

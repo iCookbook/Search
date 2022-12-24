@@ -81,7 +81,7 @@ extension SearchRequestsTableViewDataSource: UITableViewDelegate, UITableViewDat
             fatalError("Could not cast table view header to `TitleTableViewHeader` for section: \(section)")
         }
         header.configure(title: Texts.Search.recent)
-        header.addButton(buttonTitle: Texts.Search.clear, selector: #selector(clearHistoryButtonTapped))
+        header.addButton(target: self, buttonTitle: Texts.Search.clear, selector: #selector(clearHistoryButtonTapped))
         return header
     }
 }

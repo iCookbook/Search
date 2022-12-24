@@ -70,10 +70,9 @@ final class SearchViewController: BaseRecipesViewController {
         tableView.delegate = searchRequestsTableViewDataSource
         tableView.dataSource = searchRequestsTableViewDataSource
         tableView.rowHeight = 44
-//        tableView.sectionHeaderHeight = 36
-//        tableView.estimatedSectionHeaderHeight = 36
         tableView.isScrollEnabled = true
         tableView.bounces = false
+        tableView.alpha = 0
         tableView.backgroundColor = Colors.systemBackground
         tableView.register(HistoryTableViewCell.self, forCellReuseIdentifier: HistoryTableViewCell.identifier)
         tableView.register(TitleTableViewHeader.self, forHeaderFooterViewReuseIdentifier: TitleTableViewHeader.identifier)
@@ -102,8 +101,6 @@ final class SearchViewController: BaseRecipesViewController {
     private func handleViewOnSearching() {
         activityIndicator.startAnimating()
         hideHistoryTableView()
-        // TODO: Fix
-        recipesCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
         
         categoriesTitleLabel.text = nil
         recommendedTitleLabel.text = nil
@@ -111,11 +108,11 @@ final class SearchViewController: BaseRecipesViewController {
         categoriesTableViewDataSource.clearData()
         categoriesTableView.reloadData()
         
-        UIView.animate(withDuration: 1.0, delay: 0.0, options: [.transitionFlipFromBottom, .curveEaseOut], animations: { [unowned self] in
-            categoriesTableViewTopAnchor.constant = 0
-            recommendedTitleLabelTopAnchor.constant = 0
-            recipesCollectionViewTopAnchor.constant = 0
-            view.layoutIfNeeded()
+        UIView.animate(withDuration: 1.4, delay: 0.2, usingSpringWithDamping: 0.8, initialSpringVelocity: 2.2, options: .allowUserInteraction, animations: {
+            self.categoriesTableViewTopAnchor.constant = 0
+            self.recommendedTitleLabelTopAnchor.constant = 0
+            self.recipesCollectionViewTopAnchor.constant = 0
+            self.view.layoutIfNeeded()
         })
     }
     
@@ -189,20 +186,17 @@ final class SearchViewController: BaseRecipesViewController {
             searchRequestsHistoryTableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             searchRequestsHistoryTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
+        UIView.animate(withDuration: 0.4, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
+            self.searchRequestsHistoryTableView.alpha = 1
+        }
     }
     
     private func hideHistoryTableView() {
-        searchRequestsHistoryTableView.removeFromSuperview()
-        UIView.animate(withDuration: 0.7, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
-//            self.searchRequestsHistoryTableView.alpha = 0
-//            self.searchRequestsHistoryTableView.removeFromSuperview()
+        UIView.animate(withDuration: 0.4, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
+            self.searchRequestsHistoryTableView.alpha = 0
         } completion: { isFinished in
-//            self.searchRequestsHistoryTableView.removeFromSuperview()
-            if isFinished {
-//                self.searchRequestsHistoryTableView.removeFromSuperview()
-            }
+            self.searchRequestsHistoryTableView.removeFromSuperview()
         }
-
     }
 }
 
