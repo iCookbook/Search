@@ -68,4 +68,14 @@ extension SearchInteractor: SearchInteractorInput {
             }
         }
     }
+    
+    func isFilteringOn() {
+        let result = !UserDefaults.dietsFilters.isEmpty ||
+                     !UserDefaults.mealsFilters.isEmpty ||
+                     !UserDefaults.dishesFilters.isEmpty ||
+                     !UserDefaults.cuisinesFilters.isEmpty
+        
+        guard let presenter = presenter as? SearchInteractorOutput else { return }
+        presenter.didProvidedIsFilteringOn(result)
+    }
 }

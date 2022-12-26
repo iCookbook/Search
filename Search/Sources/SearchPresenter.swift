@@ -29,6 +29,11 @@ extension SearchPresenter: SearchViewOutput {
         interactor.clearSearchRequestsHistory()
     }
     
+    func defineWhetherFilteringIsOn() {
+        guard let interactor = interactor as? SearchInteractorInput else { return }
+        interactor.isFilteringOn()
+    }
+    
     /// Handles tapping on a category in `categoriesTableView`.
     ///
     /// - Parameter category: the `Сategory` that the user has selected.
@@ -59,5 +64,10 @@ extension SearchPresenter: SearchInteractorOutput {
     func didClearedSearchRequestsHistory() {
         guard let view = view as? SearchViewInput else { return }
         view.didClearedSearchRequestsHistory()
+    }
+    
+    func didProvidedIsFilteringOn(_ result: Bool) {
+        guard let view = view as? SearchViewInput else { return }
+//        view.didClearedSearchRequestsHistory()
     }
 }

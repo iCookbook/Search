@@ -22,6 +22,7 @@ protocol SearchViewInput: BaseRecipesViewInput {
 protocol SearchViewOutput: BaseRecipesViewOutput {
     func fetchSearchRequestsHistory()
     func clearSearchRequestsHistory()
+    func defineWhetherFilteringIsOn()
     
     func categoryDidTapped(_ category: Cuisine)
     func requestData(by keyword: String)
@@ -30,6 +31,7 @@ protocol SearchViewOutput: BaseRecipesViewOutput {
 protocol SearchInteractorInput: BaseRecipesInteractorInput {
     func provideSearchRequestsHistory()
     func clearSearchRequestsHistory()
+    func isFilteringOn()
     
     func requestRandomData(by category: Cuisine)
     func requestData(by keyword: String)
@@ -38,6 +40,7 @@ protocol SearchInteractorInput: BaseRecipesInteractorInput {
 protocol SearchInteractorOutput: BaseRecipesInteractorOutput {
     func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String])
     func didClearedSearchRequestsHistory()
+    func didProvidedIsFilteringOn(_ result: Bool)
 }
 
 protocol SearchRouterInput: BaseRecipesRouterInput {

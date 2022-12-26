@@ -81,25 +81,24 @@ final class SearchViewController: BaseRecipesViewController {
         return tableView
     }()
     
-    private let offlineTitleLabel: UILabel = {
+    private let emptyTitleLabel: UILabel = {
         let label = UILabel()
         label.font = Fonts.errorTitle()
-        label.text = Texts.Search.offlineModeTitle
+        label.textAlignment = .center
         return label
     }()
     
-    private let offlineSubitleLabel: UILabel = {
+    private let emptySubitleLabel: UILabel = {
         let label = UILabel()
         label.font = Fonts.smallMedium()
         label.textColor = Colors.secondaryLabel
-        label.text = Texts.Search.offlineModeDescription
         label.textAlignment = .center
         label.numberOfLines = 0
         return label
     }()
     
-    private lazy var offlineStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [offlineTitleLabel, offlineSubitleLabel])
+    private lazy var emptyStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [emptyTitleLabel, emptySubitleLabel])
         stackView.axis = .vertical
         stackView.spacing = 16
         stackView.layer.zPosition = 1
@@ -121,16 +120,19 @@ final class SearchViewController: BaseRecipesViewController {
     }
     
     override func turnOnOfflineMode() {
-        view.addSubview(offlineStackView)
+        view.addSubview(emptyStackView)
+        emptyTitleLabel.text = Texts.Search.offlineModeTitle
+        emptySubitleLabel.text = Texts.Search.offlineModeDescription
+        
         categoriesTableView.removeFromSuperview()
         categoriesTitleLabel.removeFromSuperview()
         recommendedTitleLabel.removeFromSuperview()
         
         NSLayoutConstraint.activate([
-            offlineStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.layoutMargins.left),
-            offlineStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -view.layoutMargins.right),
-            offlineStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            offlineStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            emptyStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.layoutMargins.left),
+            emptyStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -view.layoutMargins.right),
+            emptyStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
     }
     
