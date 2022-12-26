@@ -244,7 +244,7 @@ final class SearchViewController: BaseRecipesViewController {
     private func hideHistoryTableView() {
         UIView.animate(withDuration: 0.4, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
             self.searchRequestsHistoryTableView.alpha = 0
-        } completion: { isFinished in
+        } completion: { _ in
             self.searchRequestsHistoryTableView.removeFromSuperview()
         }
     }

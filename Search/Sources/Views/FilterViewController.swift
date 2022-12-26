@@ -19,7 +19,7 @@ final class FilterViewController: UIViewController {
     weak var delegate: FilterDelegateProtocol?
     
     private let data: [[FilterProtocol]] = [
-        Cuisine.cuisines, Diet.allCases, Dish.allCases, Meal.allCases
+        Diet.allCases, Cuisine.cuisines, Dish.allCases, Meal.allCases
     ]
     
     /// Collection view with filters.
@@ -92,8 +92,7 @@ extension FilterViewController: UICollectionViewDataSource, UICollectionViewDele
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FilterCollectionViewCell.identifier, for: indexPath) as? FilterCollectionViewCell else {
             fatalError("Could not cast to `FilterCollectionViewCell` for indexPath \(indexPath) in cellForItemAt")
         }
-//        cell.configure
-        cell.backgroundColor = .red
+        cell.configure(with: data[indexPath.section][indexPath.row])
         return cell
     }
 }
