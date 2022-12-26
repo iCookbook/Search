@@ -8,6 +8,7 @@
 import Foundation
 import XCTest
 @testable import Search
+@testable import Common
 
 class SearchInteractorTests: XCTestCase {
     
@@ -19,7 +20,7 @@ class SearchInteractorTests: XCTestCase {
     
     override func setUpWithError() throws {
         interactor = SearchInteractor(networkManager: networkManager)
-        presenter = StubSearchPresenter()
+        presenter = StubSearchPresenter(interactor: interactor)
         interactor.presenter = presenter
     }
     
@@ -47,13 +48,15 @@ class SearchInteractorTests: XCTestCase {
         interactor.requestRandomData(by: .american)
         
         XCTAssertNotNil(presenter.providedResponse, "Provided response should not be `nil`")
-        XCTAssertTrue(presenter.withOverridingCurrentDataBool)
+        XCTAssertNotNil(presenter.withOverridingCurrentDataBool)
+        XCTAssertFalse(presenter.withOverridingCurrentDataBool)
     }
     
     func testRequestRandomDataByKeyword() throws {
         interactor.requestData(by: "some keyword")
         
-        XCTAssertNotNil(presenter.providedResponse, "Search requests history flag should not be `nil`")
+        XCTAssertNotNil(presenter.providedResponse, "Provided response should not be `nil`")
+        XCTAssertNotNil(presenter.withOverridingCurrentDataBool)
         XCTAssertTrue(presenter.withOverridingCurrentDataBool)
     }
 }

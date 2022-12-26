@@ -17,6 +17,12 @@ class StubSearchPresenter: SearchInteractorOutput {
     var providedResponse: Response!
     var withOverridingCurrentDataBool: Bool!
     
+    private let interactor: SearchInteractor!
+    
+    init(interactor: SearchInteractor) {
+        self.interactor = interactor
+    }
+    
     func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         didProvidedSearchRequestsHistoryBool = true
     }
