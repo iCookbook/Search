@@ -136,6 +136,15 @@ final class SearchViewController: BaseRecipesViewController {
         ])
     }
     
+    override func fillData(with newData: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
+        super.fillData(with: newData, nextPageUrl: nextPageUrl, withOverridingCurrentData: withOverridingCurrentData)
+        
+        if newData.isEmpty {
+            emptyTitleLabel.text = Texts.Search.emptyDataModeTitle
+            emptySubitleLabel.text = Texts.Search.emptyDataModeDescription
+        }
+    }
+    
     // MARK: - Private Methods
     
     /// When user tapps on a category or searching something, we need to display activity indicator and hide table view with all titles.

@@ -36,7 +36,7 @@ final class CategoryTableViewCell: UITableViewCell {
     // MARK: - Public Methods
     
     public func configure(category: Cuisine) {
-        mainLabel.text = "\(category.emoji)  \(category.rawValue.localized)"
+        mainLabel.text = "\(category.emoji ?? "🌏")  \(category.rawValue.localized)"
     }
     
     // MARK: - Private Methods
