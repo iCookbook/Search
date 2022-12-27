@@ -26,6 +26,7 @@ protocol SearchViewOutput: BaseRecipesViewOutput {
     
     func categoryDidTapped(_ category: Cuisine)
     func requestData(by keyword: String)
+    func provideSelectedFilters(data: [[FilterProtocol]])
 }
 
 protocol SearchInteractorInput: BaseRecipesInteractorInput {
@@ -35,6 +36,7 @@ protocol SearchInteractorInput: BaseRecipesInteractorInput {
     
     func requestRandomData(by category: Cuisine)
     func requestData(by keyword: String)
+    func turnOnSelectedFilters(data: [[FilterProtocol]])
 }
 
 protocol SearchInteractorOutput: BaseRecipesInteractorOutput {

@@ -31,7 +31,11 @@ extension SearchInteractor: SearchInteractorInput {
     ///
     /// - Parameter category: category to request data by.
     func requestRandomData(by category: Cuisine) {
-        let endpoint = Endpoint.random(by: category)
+        if !UserDefaults.cuisinesFilters.contains(category) {
+            UserDefaults.cuisinesFilters.append(category)
+        }
+        
+        let endpoint = Endpoint.random(by: category.rawValue)
         let request = NetworkRequest(endpoint: endpoint)
         
         networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
@@ -67,6 +71,13 @@ extension SearchInteractor: SearchInteractorInput {
                 presenter.handleError(error)
             }
         }
+    }
+    
+    func turnOnSelectedFilters(data: [[FilterProtocol]]) {
+        UserDefaults.dietsFilters = data[0] as? [Diet] ?? []
+        UserDefaults.cuisinesFilters = data[1] as? [Cuisine] ?? []
+        UserDefaults.dishesFilters = data[2] as? [Dish] ?? []
+        UserDefaults.mealsFilters = data[3] as? [Meal] ?? []
     }
     
     func isFilteringOn() {

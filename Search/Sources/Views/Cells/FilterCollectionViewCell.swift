@@ -12,19 +12,37 @@ import Resources
 
 final class FilterCollectionViewCell: UICollectionViewCell {
     
+    override var isSelected: Bool {
+        didSet {
+            indicatorView.backgroundColor = isSelected ? Colors.appColor : Colors.tertiaryLabel
+        }
+    }
+    
     // MARK: - Private Properties
     
-    private let mainLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    private let indicatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = Colors.tertiaryLabel
+        view.layer.cornerRadius = 4
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
+    
+    private let mainLabel = UILabel()
     
     private let emojiLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 40)
-        label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private lazy var mainStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [emojiLabel, mainLabel])
+        stackView.axis = .vertical
+        stackView.distribution = .fillEqually
+        stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }()
     
     // MARK: - Init
@@ -44,6 +62,7 @@ final class FilterCollectionViewCell: UICollectionViewCell {
         
         mainLabel.text = nil
         emojiLabel.text = nil
+        indicatorView.backgroundColor = Colors.tertiaryLabel
     }
     
     // MARK: - Public Methods
@@ -60,14 +79,15 @@ final class FilterCollectionViewCell: UICollectionViewCell {
     
     private func setupView() {
         contentView.backgroundColor = Colors.systemGroupedBackground
-        let mainStackView = UIStackView(arrangedSubviews: [emojiLabel, mainLabel])
-        mainStackView.axis = .vertical
-        mainStackView.spacing = 8
-        mainStackView.alignment = .center
         contentView.addSubview(mainStackView)
-        mainStackView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(indicatorView)
         
         NSLayoutConstraint.activate([
+            indicatorView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            indicatorView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            indicatorView.heightAnchor.constraint(equalToConstant: 8),
+            indicatorView.widthAnchor.constraint(equalToConstant: 8),
+            
             mainStackView.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
             mainStackView.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
             mainStackView.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),

@@ -391,7 +391,10 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
 // MARK: - FilterDelegateProtocol
 
 extension SearchViewController: FilterDelegateProtocol {
-    
+    func provideSelectedFilters(data: [[FilterProtocol]]) {
+        guard let presenter = presenter as? SearchViewOutput else { return }
+        presenter.provideSelectedFilters(data: data)
+    }
 }
 
 extension SearchViewController {

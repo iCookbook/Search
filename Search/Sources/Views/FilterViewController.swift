@@ -11,6 +11,7 @@ import Models
 import Resources
 
 protocol FilterDelegateProtocol: AnyObject {
+    func provideSelectedFilters(data: [[FilterProtocol]])
 }
 
 final class FilterViewController: UIViewController {
@@ -30,6 +31,7 @@ final class FilterViewController: UIViewController {
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.allowsMultipleSelection = true
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
         collectionView.register(FilterCollectionViewCell.self, forCellWithReuseIdentifier: FilterCollectionViewCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -56,6 +58,12 @@ final class FilterViewController: UIViewController {
         setupView()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        selectOnFilters()
+    }
+    
     // MARK: - Private Methods
     
     private func setupView() {
@@ -74,7 +82,45 @@ final class FilterViewController: UIViewController {
     
     /// Handles tapping on _"Close"_ bar button.
     @objc private func closeBarButtonTapped() {
+        /// Gets all selected filters
+        var activeFilters: [[FilterProtocol]] = [[], [], [], []]
+        filtersCollectionView.indexPathsForSelectedItems?.forEach { indexPath in
+            activeFilters[indexPath.section].append(data[indexPath.section][indexPath.row])
+        }
+        /// Provides them to the delegate
+        delegate?.provideSelectedFilters(data: activeFilters)
         dismiss(animated: true)
+    }
+    
+    private func selectOnFilters() {
+        UserDefaults.dietsFilters.forEach { diet in
+            let index = data[0].firstIndex {
+                guard let item = $0 as? Diet else { return false }
+                return item == diet
+            } ?? 0
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 0), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+        }
+        UserDefaults.cuisinesFilters.forEach { cuisine in
+            let index = data[1].firstIndex {
+                guard let item = $0 as? Cuisine else { return false }
+                return item == cuisine
+            } ?? 0
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 1), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+        }
+        UserDefaults.dishesFilters.forEach { dish in
+            let index = data[2].firstIndex {
+                guard let item = $0 as? Dish else { return false }
+                return item == dish
+            } ?? 0
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 2), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+        }
+        UserDefaults.mealsFilters.forEach { meal in
+            let index = data[3].firstIndex {
+                guard let item = $0 as? Meal else { return false }
+                return item == meal
+            } ?? 0
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 3), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+        }
     }
 }
 

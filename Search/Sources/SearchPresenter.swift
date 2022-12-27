@@ -52,6 +52,11 @@ extension SearchPresenter: SearchViewOutput {
             interactor.requestData(by: keyword)
         }
     }
+    
+    func provideSelectedFilters(data: [[FilterProtocol]]) {
+        guard let interactor = interactor as? SearchInteractorInput else { return }
+        interactor.turnOnSelectedFilters(data: data)
+    }
 }
 
 extension SearchPresenter: SearchInteractorOutput {
