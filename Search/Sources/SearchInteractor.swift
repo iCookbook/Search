@@ -60,9 +60,13 @@ extension SearchInteractor: SearchInteractorInput {
         guard let presenter = presenter as? SearchInteractorOutput else { return }
         presenter.didProvidedSearchRequestsHistory(UserDefaults.searchRequestsHistory)
         
-        let endpoint = Endpoint.create(by: keyword)
+        let endpoint = Endpoint.create(by: keyword,
+                                       meals: convertMealFilters(from: UserDefaults.mealsFilters),
+                                       diets: convertDietFilters(from: UserDefaults.dietsFilters),
+                                       cuisines: convertCuisineFilters(from: UserDefaults.cuisinesFilters),
+                                       dishes: convertDishFilters(from: UserDefaults.dishesFilters))
         let request = NetworkRequest(endpoint: endpoint)
-        
+        print(endpoint.url!)
         networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
             switch result {
             case .success(let response):
@@ -74,10 +78,10 @@ extension SearchInteractor: SearchInteractorInput {
     }
     
     func turnOnSelectedFilters(data: [[FilterProtocol]]) {
-        UserDefaults.dietsFilters = data[0] as? [Diet] ?? []
-        UserDefaults.cuisinesFilters = data[1] as? [Cuisine] ?? []
-        UserDefaults.dishesFilters = data[2] as? [Dish] ?? []
-        UserDefaults.mealsFilters = data[3] as? [Meal] ?? []
+        UserDefaults.dietsFilters = data[Filters.diet.rawValue] as? [Diet] ?? []
+        UserDefaults.cuisinesFilters = data[Filters.cuisine.rawValue] as? [Cuisine] ?? []
+        UserDefaults.dishesFilters = data[Filters.dish.rawValue] as? [Dish] ?? []
+        UserDefaults.mealsFilters = data[Filters.meal.rawValue] as? [Meal] ?? []
     }
     
     func isFilteringOn() {
@@ -88,5 +92,64 @@ extension SearchInteractor: SearchInteractorInput {
         
         guard let presenter = presenter as? SearchInteractorOutput else { return }
         presenter.didProvidedIsFilteringOn(result)
+    }
+}
+
+// MARK: - Helper methods
+
+extension SearchInteractor {
+    func convertCuisineFilters(from data: [Cuisine]) -> String? {
+        /*
+        &diet=balanced&diet=high-fiber&
+         cuisineType=American&cuisineType=Asian&
+         mealType=Breakfast&mealType=Dinner
+         &dishType=Biscuits%20and%20cookies&dishType=Bread
+         Diet:
+         * balanced,
+         * high-fiber
+         Cuisine:
+         * Asian
+         * American
+         Meal:
+         * Biscuits%20and%20cookies
+         * Bread
+        */
+        var result = ""
+        
+        data.forEach {
+            result += "cuisineType=\($0.rawValue)"
+        }
+        
+        return result != "" ? result : nil
+    }
+    
+    func convertDietFilters(from data: [Diet]) -> String? {
+        var result = ""
+        
+        data.forEach {
+            result += "diet=\($0.rawValue)"
+        }
+        
+        return result != "" ? result : nil
+    }
+    
+    func convertDishFilters(from data: [Dish]) -> String? {
+        var result = ""
+        
+        data.forEach {
+            result += "dishType=\($0.rawValue)"
+        }
+        
+        return result != "" ? result : nil
+    }
+    
+    func convertMealFilters(from data: [Meal]) -> String? {
+        var result = ""
+        
+        data.forEach {
+            result += "mealType=\($0.rawValue)"
+        }
+        
+        return result != "" ? result : nil
     }
 }

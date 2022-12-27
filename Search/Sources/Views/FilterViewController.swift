@@ -94,32 +94,32 @@ final class FilterViewController: UIViewController {
     
     private func selectOnFilters() {
         UserDefaults.dietsFilters.forEach { diet in
-            let index = data[0].firstIndex {
+            let index = data[Filters.diet.rawValue].firstIndex {
                 guard let item = $0 as? Diet else { return false }
                 return item == diet
             } ?? 0
-            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 0), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: Filters.diet.rawValue), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
         }
         UserDefaults.cuisinesFilters.forEach { cuisine in
-            let index = data[1].firstIndex {
+            let index = data[Filters.cuisine.rawValue].firstIndex {
                 guard let item = $0 as? Cuisine else { return false }
                 return item == cuisine
             } ?? 0
-            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 1), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: Filters.cuisine.rawValue), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
         }
         UserDefaults.dishesFilters.forEach { dish in
-            let index = data[2].firstIndex {
+            let index = data[Filters.dish.rawValue].firstIndex {
                 guard let item = $0 as? Dish else { return false }
                 return item == dish
             } ?? 0
-            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 2), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: Filters.dish.rawValue), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
         }
         UserDefaults.mealsFilters.forEach { meal in
-            let index = data[3].firstIndex {
+            let index = data[Filters.meal.rawValue].firstIndex {
                 guard let item = $0 as? Meal else { return false }
                 return item == meal
             } ?? 0
-            filtersCollectionView.selectItem(at: IndexPath(row: index, section: 3), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
+            filtersCollectionView.selectItem(at: IndexPath(row: index, section: Filters.meal.rawValue), animated: true, scrollPosition: UICollectionView.ScrollPosition.top)
         }
     }
 }
