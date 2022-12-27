@@ -98,58 +98,19 @@ extension SearchInteractor: SearchInteractorInput {
 // MARK: - Helper methods
 
 extension SearchInteractor {
-    func convertCuisineFilters(from data: [Cuisine]) -> String? {
-        /*
-        &diet=balanced&diet=high-fiber&
-         cuisineType=American&cuisineType=Asian&
-         mealType=Breakfast&mealType=Dinner
-         &dishType=Biscuits%20and%20cookies&dishType=Bread
-         Diet:
-         * balanced,
-         * high-fiber
-         Cuisine:
-         * Asian
-         * American
-         Meal:
-         * Biscuits%20and%20cookies
-         * Bread
-        */
-        var result = ""
-        
-        data.forEach {
-            result += "cuisineType=\($0.rawValue)"
-        }
-        
-        return result != "" ? result : nil
+    func convertCuisineFilters(from data: [Cuisine]) -> [(String, String)] {
+        data.map { ("cuisineType", $0.rawValue) }
     }
     
-    func convertDietFilters(from data: [Diet]) -> String? {
-        var result = ""
-        
-        data.forEach {
-            result += "diet=\($0.rawValue)"
-        }
-        
-        return result != "" ? result : nil
+    func convertDietFilters(from data: [Diet]) -> [(String, String)] {
+        data.map { ("diet", $0.rawValue.lowercased()) }
     }
     
-    func convertDishFilters(from data: [Dish]) -> String? {
-        var result = ""
-        
-        data.forEach {
-            result += "dishType=\($0.rawValue)"
-        }
-        
-        return result != "" ? result : nil
+    func convertDishFilters(from data: [Dish]) -> [(String, String)] {
+        data.map { ("dishType", $0.rawValue) }
     }
     
-    func convertMealFilters(from data: [Meal]) -> String? {
-        var result = ""
-        
-        data.forEach {
-            result += "mealType=\($0.rawValue)"
-        }
-        
-        return result != "" ? result : nil
+    func convertMealFilters(from data: [Meal]) -> [(String, String)] {
+        data.map { ("mealType", $0.rawValue) }
     }
 }
