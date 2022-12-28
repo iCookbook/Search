@@ -66,7 +66,7 @@ extension SearchInteractor: SearchInteractorInput {
                                        cuisines: convertCuisineFilters(from: UserDefaults.cuisinesFilters),
                                        dishes: convertDishFilters(from: UserDefaults.dishesFilters))
         let request = NetworkRequest(endpoint: endpoint)
-        print(endpoint.url!)
+        
         networkManager.perform(request: request) { [unowned self] (result: Result<Response, NetworkManagerError>) in
             switch result {
             case .success(let response):

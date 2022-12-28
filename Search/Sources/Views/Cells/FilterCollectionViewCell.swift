@@ -12,9 +12,12 @@ import Resources
 
 final class FilterCollectionViewCell: UICollectionViewCell {
     
+    /// A Boolean value that indicates whether the cell is selected.
     override var isSelected: Bool {
         didSet {
-            indicatorView.backgroundColor = isSelected ? Colors.appColor : Colors.tertiaryLabel
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.transitionCurlUp, .allowUserInteraction]) {
+                self.indicatorView.backgroundColor = self.isSelected ? Colors.appColor : Colors.tertiaryLabel
+            }
         }
     }
     
@@ -32,14 +35,14 @@ final class FilterCollectionViewCell: UICollectionViewCell {
     
     private let emojiLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 40)
+        label.font = UIFont.systemFont(ofSize: 32)
         return label
     }()
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [emojiLabel, mainLabel])
         stackView.axis = .vertical
-        stackView.distribution = .fillEqually
+        stackView.distribution = .fillProportionally
         stackView.alignment = .center
         stackView.translatesAutoresizingMaskIntoConstraints = false
         return stackView
@@ -79,6 +82,8 @@ final class FilterCollectionViewCell: UICollectionViewCell {
     
     private func setupView() {
         contentView.backgroundColor = Colors.systemGroupedBackground
+        contentView.layer.cornerRadius = 12
+        
         contentView.addSubview(mainStackView)
         contentView.addSubview(indicatorView)
         

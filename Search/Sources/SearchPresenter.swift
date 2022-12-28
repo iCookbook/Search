@@ -73,6 +73,6 @@ extension SearchPresenter: SearchInteractorOutput {
     
     func didProvidedIsFilteringOn(_ result: Bool) {
         guard let view = view as? SearchViewInput else { return }
-//        view.didClearedSearchRequestsHistory()
+        view.changeFilterIcon(by: result)
     }
 }

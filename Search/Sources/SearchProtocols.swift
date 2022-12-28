@@ -17,6 +17,7 @@ public protocol SearchModuleOutput: BaseRecipesModuleOutput {
 protocol SearchViewInput: BaseRecipesViewInput {
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String])
     func didClearedSearchRequestsHistory()
+    func changeFilterIcon(by flag: Bool)
 }
 
 protocol SearchViewOutput: BaseRecipesViewOutput {

@@ -22,8 +22,6 @@ final class SearchViewController: BaseRecipesViewController {
         searchController.searchBar.sizeToFit()
         searchController.searchBar.delegate = self
         searchController.searchBar.showsBookmarkButton = true
-        searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
-        searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .highlighted) // .normal
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
         return searchController
@@ -117,6 +115,7 @@ final class SearchViewController: BaseRecipesViewController {
         presenter.requestRandomData()
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.fetchSearchRequestsHistory()
+        presenter.defineWhetherFilteringIsOn()
     }
     
     override func turnOnOfflineMode() {
@@ -273,6 +272,16 @@ extension SearchViewController: SearchViewInput {
             self.searchRequestsHistoryTableView.reloadData()
         }
     }
+    
+    func changeFilterIcon(by flag: Bool) {
+        UIView.animate(withDuration: 0.6, delay: 0.0, options: [.transitionCurlUp, .allowUserInteraction]) {
+            if flag {
+                self.searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .normal)
+            } else {
+                self.searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
+            }
+        }
+    }
 }
 
 // MARK: - UISearchBarDelegate
@@ -394,6 +403,7 @@ extension SearchViewController: FilterDelegateProtocol {
     func provideSelectedFilters(data: [[FilterProtocol]]) {
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.provideSelectedFilters(data: data)
+        presenter.defineWhetherFilteringIsOn()
     }
 }
 

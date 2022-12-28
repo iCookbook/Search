@@ -26,13 +26,13 @@ final class FilterViewController: UIViewController {
     /// Collection view with filters.
     private lazy var filtersCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: (view.frame.size.width - 32) / 2, height: view.frame.size.height * 0.38)
+        layout.itemSize = CGSize(width: view.frame.size.width / 2 - 30, height: 80)
         let collectionView = CollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.allowsMultipleSelection = true
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 16, bottom: 20, right: 16)
         collectionView.register(FilterCollectionViewCell.self, forCellWithReuseIdentifier: FilterCollectionViewCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
