@@ -9,6 +9,7 @@ import UIKit
 import CommonUI
 import Models
 import Resources
+import Logger
 
 protocol FilterDelegateProtocol: AnyObject {
     func provideSelectedFilters(data: [[FilterProtocol]])
@@ -23,10 +24,13 @@ final class FilterViewController: UIViewController {
         Diet.allCases, Cuisine.cuisines, Dish.allCases, Meal.allCases
     ]
     
+    /// Titles for headers.
+    private let headerTitles = [Texts.Search.diets, Texts.Search.cuisines, Texts.Search.dishes, Texts.Search.meals]
+    
     /// Collection view with filters.
     private lazy var filtersCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: view.frame.size.width / 2 - 30, height: 80)
+        layout.minimumInteritemSpacing = 0
         let collectionView = CollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .clear
         collectionView.delegate = self
@@ -34,6 +38,7 @@ final class FilterViewController: UIViewController {
         collectionView.allowsMultipleSelection = true
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 16, bottom: 20, right: 16)
         collectionView.register(FilterCollectionViewCell.self, forCellWithReuseIdentifier: FilterCollectionViewCell.identifier)
+        collectionView.register(CollectionViewHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: CollectionViewHeader.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -124,7 +129,7 @@ final class FilterViewController: UIViewController {
     }
 }
 
-extension FilterViewController: UICollectionViewDataSource, UICollectionViewDelegate {
+extension FilterViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         data.count
@@ -140,5 +145,32 @@ extension FilterViewController: UICollectionViewDataSource, UICollectionViewDele
         }
         cell.configure(with: data[indexPath.section][indexPath.row])
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: CollectionViewHeader.identifier, for: indexPath) as? CollectionViewHeader else {
+                fatalError("Could not cast to `CollectionViewHeader` for indexPath \(indexPath) in `viewForSupplementaryElementOfKind` method")
+            }
+            header.configure(title: headerTitles[indexPath.section])
+            return header
+        default:
+            Logger.log("Unhandled case for kind \(kind) and indexPath \(indexPath). Check description for details:", logType: .warning)
+            return UICollectionReusableView()
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        switch indexPath.section {
+        case 0:
+            return CGSize(width: collectionView.frame.size.width / 2 - 24, height: 40)
+        default:
+            return CGSize(width: collectionView.frame.size.width / 2 - 24, height: 80)
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        CGSize(width: filtersCollectionView.frame.size.width, height: 50)
     }
 }
