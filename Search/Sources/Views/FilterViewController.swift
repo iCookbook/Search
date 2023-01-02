@@ -141,7 +141,8 @@ extension FilterViewController: UICollectionViewDataSource, UICollectionViewDele
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FilterCollectionViewCell.identifier, for: indexPath) as? FilterCollectionViewCell else {
-            fatalError("Could not cast to `FilterCollectionViewCell` for indexPath \(indexPath) in cellForItemAt")
+            Logger.log("Could not cast to `FilterCollectionViewCell` for indexPath \(indexPath) in cellForItemAt", logType: .error)
+            return UICollectionViewCell()
         }
         cell.configure(with: data[indexPath.section][indexPath.row])
         return cell
@@ -151,7 +152,8 @@ extension FilterViewController: UICollectionViewDataSource, UICollectionViewDele
         switch kind {
         case UICollectionView.elementKindSectionHeader:
             guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: CollectionViewHeader.identifier, for: indexPath) as? CollectionViewHeader else {
-                fatalError("Could not cast to `CollectionViewHeader` for indexPath \(indexPath) in `viewForSupplementaryElementOfKind` method")
+                Logger.log("Could not cast to `CollectionViewHeader` for indexPath \(indexPath) in `viewForSupplementaryElementOfKind` method", logType: .error)
+                return UICollectionViewCell()
             }
             header.configure(title: headerTitles[indexPath.section])
             return header
