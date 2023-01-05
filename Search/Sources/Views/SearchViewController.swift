@@ -135,8 +135,8 @@ final class SearchViewController: BaseRecipesViewController {
         ])
     }
     
-    override func fillData(with newData: [Recipe], nextPageUrl: String?, withOverridingCurrentData: Bool) {
-        super.fillData(with: newData, nextPageUrl: nextPageUrl, withOverridingCurrentData: withOverridingCurrentData)
+    override func fillData(with newData: [Recipe], withOverridingCurrentData: Bool) {
+        super.fillData(with: newData, withOverridingCurrentData: withOverridingCurrentData)
         
         if newData.isEmpty {
             emptyTitleLabel.text = Texts.Search.emptyDataModeTitle
@@ -258,19 +258,13 @@ extension SearchViewController: SearchViewInput {
     /// - Parameter searchRequestsHistory: search requests history from UserDefaults.
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         searchRequestsTableViewDataSource.fillInData(searchRequestsHistory: searchRequestsHistory)
-        
-        DispatchQueue.main.async {
-            self.searchRequestsHistoryTableView.reloadData()
-        }
+        searchRequestsHistoryTableView.reloadData()
     }
     
     /// Clears search requests history from data source.
-    func didClearedSearchRequestsHistory() {
+    func didClearSearchRequestsHistory() {
         searchRequestsTableViewDataSource.clearData()
-        
-        DispatchQueue.main.async {
-            self.searchRequestsHistoryTableView.reloadData()
-        }
+        searchRequestsHistoryTableView.reloadData()
     }
     
     func changeFilterIcon(by flag: Bool) {
@@ -309,7 +303,6 @@ extension SearchViewController: UISearchBarDelegate {
               let keyword = searchBar.text, !keyword.isEmpty else { return }
         
         presenter.requestData(by: keyword)
-        presenter.fetchSearchRequestsHistory()
         handleViewOnSearching()
     }
     
@@ -336,13 +329,7 @@ extension SearchViewController {
         if (recipesCollectionView.contentSize.height != 0 &&
             categoriesTableViewDataSource.isEmpty() &&
             scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
-            
-            /// Fetcing should not be in progress and there should be valid next page url.
-            guard !isFetchingInProgress,
-                  let nextPageUrl = nextPageUrl else { return }
-            
-            isFetchingInProgress = true
-            presenter.requestData(urlString: nextPageUrl)
+            presenter.requestData()
         }
     }
     
@@ -355,7 +342,7 @@ extension SearchViewController {
                 fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
             }
             /// If there is link to the next page and there is no categories start loading.
-            if nextPageUrl != nil && categoriesTableViewDataSource.isEmpty() {
+            if presenter.willRequestDataForPagination() && categoriesTableViewDataSource.isEmpty() {
                 footer.startActivityIndicator()
             }
         default:

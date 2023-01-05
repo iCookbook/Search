@@ -16,7 +16,7 @@ public protocol SearchModuleOutput: BaseRecipesModuleOutput {
 
 protocol SearchViewInput: BaseRecipesViewInput {
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String])
-    func didClearedSearchRequestsHistory()
+    func didClearSearchRequestsHistory()
     func changeFilterIcon(by flag: Bool)
 }
 
@@ -41,9 +41,9 @@ protocol SearchInteractorInput: BaseRecipesInteractorInput {
 }
 
 protocol SearchInteractorOutput: BaseRecipesInteractorOutput {
-    func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String])
-    func didClearedSearchRequestsHistory()
-    func didProvidedIsFilteringOn(_ result: Bool)
+    func didProvideSearchRequestsHistory(_ searchRequestsHistory: [String])
+    func didClearSearchRequestsHistory()
+    func didProvideIsFilteringOn(_ result: Bool)
 }
 
 protocol SearchRouterInput: BaseRecipesRouterInput {

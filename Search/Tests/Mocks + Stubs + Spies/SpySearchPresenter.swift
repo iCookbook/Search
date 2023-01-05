@@ -16,6 +16,7 @@ class StubSearchPresenter: SearchInteractorOutput {
     var didClearedSearchRequestsHistoryBool: Bool!
     var providedResponse: Response!
     var withOverridingCurrentDataBool: Bool!
+    var didProvidedIsFilteringOnBool: Bool!
     
     private let interactor: SearchInteractor!
     
@@ -38,5 +39,9 @@ class StubSearchPresenter: SearchInteractorOutput {
     
     func handleError(_ error: NetworkManagerError) {
         handledError = error
+    }
+    
+    func didProvidedIsFilteringOn(_ result: Bool) {
+        didProvidedIsFilteringOnBool = result
     }
 }

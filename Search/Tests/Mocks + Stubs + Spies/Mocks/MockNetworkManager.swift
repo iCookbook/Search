@@ -7,6 +7,7 @@
 
 import Networking
 import Models
+import Resources
 
 class MockNetworkManager: NetworkManagerProtocol {
     func perform<Model>(request: NetworkRequest, completion: @escaping (Result<Model, NetworkManagerError>) -> Void) where Model : Decodable, Model : Encodable {
@@ -15,7 +16,7 @@ class MockNetworkManager: NetworkManagerProtocol {
     }
     
     func obtainData(request: NetworkRequest, completion: @escaping (Result<Data, NetworkManagerError>) -> Void) {
-        let data = Data([1, 2, 3])
+        let data = Resources.Images.sampleRecipeImage.pngData()!
         completion(.success(data))
     }
 }

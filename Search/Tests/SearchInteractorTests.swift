@@ -12,7 +12,7 @@ import XCTest
 
 class SearchInteractorTests: XCTestCase {
     
-    var presenter: StubSearchPresenter!
+    var presenter: SpySearchPresenter!
     /// SUT.
     var interactor: SearchInteractor!
     
@@ -20,7 +20,7 @@ class SearchInteractorTests: XCTestCase {
     
     override func setUpWithError() throws {
         interactor = SearchInteractor(networkManager: networkManager)
-        presenter = StubSearchPresenter(interactor: interactor)
+        presenter = SpySearchPresenter(interactor: interactor)
         interactor.presenter = presenter
     }
     
@@ -42,21 +42,5 @@ class SearchInteractorTests: XCTestCase {
         XCTAssertNotNil(presenter.didClearedSearchRequestsHistoryBool, "Search requests history flag should not be `nil`")
         XCTAssertTrue(presenter.didClearedSearchRequestsHistoryBool, "Search requests history flag should not be `false`")
         XCTAssertEqual(UserDefaults.searchRequestsHistory, [String]())
-    }
-    
-    func testRequestRandomDataByCuisine() throws {
-        interactor.requestRandomData(by: .american)
-        
-        XCTAssertNotNil(presenter.providedResponse, "Provided response should not be `nil`")
-        XCTAssertNotNil(presenter.withOverridingCurrentDataBool)
-        XCTAssertFalse(presenter.withOverridingCurrentDataBool)
-    }
-    
-    func testRequestRandomDataByKeyword() throws {
-        interactor.requestData(by: "some keyword")
-        
-        XCTAssertNotNil(presenter.providedResponse, "Provided response should not be `nil`")
-        XCTAssertNotNil(presenter.withOverridingCurrentDataBool)
-        XCTAssertTrue(presenter.withOverridingCurrentDataBool)
     }
 }

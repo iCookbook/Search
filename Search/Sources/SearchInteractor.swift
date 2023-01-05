@@ -17,14 +17,14 @@ extension SearchInteractor: SearchInteractorInput {
     /// Provides search requests history from UserDefaults.
     func provideSearchRequestsHistory() {
         guard let presenter = presenter as? SearchInteractorOutput else { return }
-        presenter.didProvidedSearchRequestsHistory(UserDefaults.searchRequestsHistory)
+        presenter.didProvideSearchRequestsHistory(UserDefaults.searchRequestsHistory)
     }
     
     /// Clears search requests history in UserDefaults.
     func clearSearchRequestsHistory() {
         UserDefaults.searchRequestsHistory = []
         guard let presenter = presenter as? SearchInteractorOutput else { return }
-        presenter.didClearedSearchRequestsHistory()
+        presenter.didClearSearchRequestsHistory()
     }
     
     /// Provides `Response` from the server with random recipes by a specific category.
@@ -58,7 +58,7 @@ extension SearchInteractor: SearchInteractorInput {
         }
         
         guard let presenter = presenter as? SearchInteractorOutput else { return }
-        presenter.didProvidedSearchRequestsHistory(UserDefaults.searchRequestsHistory)
+        presenter.didProvideSearchRequestsHistory(UserDefaults.searchRequestsHistory)
         
         let endpoint = Endpoint.create(by: keyword,
                                        meals: convertMealFilters(from: UserDefaults.mealsFilters),
@@ -91,7 +91,7 @@ extension SearchInteractor: SearchInteractorInput {
                      !UserDefaults.cuisinesFilters.isEmpty
         
         guard let presenter = presenter as? SearchInteractorOutput else { return }
-        presenter.didProvidedIsFilteringOn(result)
+        presenter.didProvideIsFilteringOn(result)
     }
 }
 

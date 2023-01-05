@@ -61,17 +61,23 @@ extension SearchPresenter: SearchViewOutput {
 
 extension SearchPresenter: SearchInteractorOutput {
     
-    func didProvidedSearchRequestsHistory(_ searchRequestsHistory: [String]) {
+    func didProvideSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         guard let view = view as? SearchViewInput else { return }
-        view.fillInSearchRequestsHistory(searchRequestsHistory)
+        
+        DispatchQueue.main.async {
+            view.fillInSearchRequestsHistory(searchRequestsHistory)
+        }
     }
     
-    func didClearedSearchRequestsHistory() {
+    func didClearSearchRequestsHistory() {
         guard let view = view as? SearchViewInput else { return }
-        view.didClearedSearchRequestsHistory()
+        
+        DispatchQueue.main.async {
+            view.didClearSearchRequestsHistory()
+        }
     }
     
-    func didProvidedIsFilteringOn(_ result: Bool) {
+    func didProvideIsFilteringOn(_ result: Bool) {
         guard let view = view as? SearchViewInput else { return }
         view.changeFilterIcon(by: result)
     }
