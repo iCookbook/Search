@@ -12,19 +12,15 @@ This module is opened at the 2nd. tab of the application and created in  [AppCoo
 
 This module has 4 dependencies:
 
-- `Common` to inherit logic from `BaseRecipes` from [Common](https://github.com/iCookbook/Common) module
-- `CommonUI` for some reasons:
+- [Common](https://github.com/iCookbook/Common) to inherit logic from `BaseRecipes`
+- [CommonUI](https://github.com/iCookbook/CommonUI) for some reasons:
     * Image loader in `UIImageView`
     * Cells identifiers
     * `TitleHeaderTableView` class
-- `Models` to use data models
-- `Networking` to fetch recipes from the server
-- `Resources` for access to resources of the application
-
-## Screenshots
-
-| <img src="https://user-images.githubusercontent.com/60363270/202233121-0b844ddb-f370-4703-86a6-4dcf8088c085.png" width=200> | <img src="https://user-images.githubusercontent.com/60363270/202233054-203bcf82-8bb3-4417-bf4a-79ba8ca7f961.png" width=200> | <img src="https://user-images.githubusercontent.com/60363270/202232994-b4a2aa4c-b6f9-4975-9314-5ee6fa93a561.png" width=200> |
-|---|---|---|
+- [Models](https://github.com/iCookbook/Models) to use data models
+- [Networking](https://github.com/iCookbook/Networking) to fetch recipes from the server
+- [Resources](https://github.com/iCookbook/Resources) for access to resources of the application
+- [Logger](https://github.com/iCookbook/Logger) to log data in debug mode
 
 
 ## Data Sources
@@ -38,3 +34,12 @@ They implement the delegate methods and use the view reference to pass the deleg
 
 - `SearchCategoriesTableViewDataSourceDelegate`
 - `SearchRequestsTableViewDataSourceDelegate`
+
+## Screenshots
+
+| <img src="https://user-images.githubusercontent.com/60363270/202233121-0b844ddb-f370-4703-86a6-4dcf8088c085.png" width=200> | <img src="https://user-images.githubusercontent.com/60363270/202233054-203bcf82-8bb3-4417-bf4a-79ba8ca7f961.png" width=200> | <img src="https://user-images.githubusercontent.com/60363270/202232994-b4a2aa4c-b6f9-4975-9314-5ee6fa93a561.png" width=200> |
+|---|---|---|
+
+---
+
+For more details, read [GitHub Wiki](https://github.com/iCookbook/Search/wiki) documentation
