@@ -22,8 +22,6 @@ final class SearchViewController: BaseRecipesViewController {
         searchController.searchBar.sizeToFit()
         searchController.searchBar.delegate = self
         searchController.searchBar.showsBookmarkButton = true
-        searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
-        searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .highlighted) // .normal
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
         return searchController
@@ -81,25 +79,24 @@ final class SearchViewController: BaseRecipesViewController {
         return tableView
     }()
     
-    private let offlineTitleLabel: UILabel = {
+    private let emptyTitleLabel: UILabel = {
         let label = UILabel()
         label.font = Fonts.errorTitle()
-        label.text = Texts.Search.offlineModeTitle
+        label.textAlignment = .center
         return label
     }()
     
-    private let offlineSubitleLabel: UILabel = {
+    private let emptySubitleLabel: UILabel = {
         let label = UILabel()
         label.font = Fonts.smallMedium()
         label.textColor = Colors.secondaryLabel
-        label.text = Texts.Search.offlineModeDescription
         label.textAlignment = .center
         label.numberOfLines = 0
         return label
     }()
     
-    private lazy var offlineStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [offlineTitleLabel, offlineSubitleLabel])
+    private lazy var emptyStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [emptyTitleLabel, emptySubitleLabel])
         stackView.axis = .vertical
         stackView.spacing = 16
         stackView.layer.zPosition = 1
@@ -118,20 +115,33 @@ final class SearchViewController: BaseRecipesViewController {
         presenter.requestRandomData()
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.fetchSearchRequestsHistory()
+        presenter.defineWhetherFilteringIsOn()
     }
     
     override func turnOnOfflineMode() {
-        view.addSubview(offlineStackView)
+        view.addSubview(emptyStackView)
+        emptyTitleLabel.text = Texts.Search.offlineModeTitle
+        emptySubitleLabel.text = Texts.Search.offlineModeDescription
+        
         categoriesTableView.removeFromSuperview()
         categoriesTitleLabel.removeFromSuperview()
         recommendedTitleLabel.removeFromSuperview()
         
         NSLayoutConstraint.activate([
-            offlineStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.layoutMargins.left),
-            offlineStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -view.layoutMargins.right),
-            offlineStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            offlineStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            emptyStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: view.layoutMargins.left),
+            emptyStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -view.layoutMargins.right),
+            emptyStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            emptyStackView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
+    }
+    
+    override func fillData(with newData: [Recipe], withOverridingCurrentData: Bool) {
+        super.fillData(with: newData, withOverridingCurrentData: withOverridingCurrentData)
+        
+        if newData.isEmpty {
+            emptyTitleLabel.text = Texts.Search.emptyDataModeTitle
+            emptySubitleLabel.text = Texts.Search.emptyDataModeDescription
+        }
     }
     
     // MARK: - Private Methods
@@ -216,6 +226,7 @@ final class SearchViewController: BaseRecipesViewController {
         ])
     }
     
+    /// Adds history table view to the view.
     private func showHistoryTableView() {
         view.addSubview(searchRequestsHistoryTableView)
         
@@ -230,10 +241,11 @@ final class SearchViewController: BaseRecipesViewController {
         }
     }
     
+    /// Removes history table view from the view.
     private func hideHistoryTableView() {
         UIView.animate(withDuration: 0.4, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
             self.searchRequestsHistoryTableView.alpha = 0
-        } completion: { isFinished in
+        } completion: { _ in
             self.searchRequestsHistoryTableView.removeFromSuperview()
         }
     }
@@ -248,18 +260,25 @@ extension SearchViewController: SearchViewInput {
     /// - Parameter searchRequestsHistory: search requests history from UserDefaults.
     func fillInSearchRequestsHistory(_ searchRequestsHistory: [String]) {
         searchRequestsTableViewDataSource.fillInData(searchRequestsHistory: searchRequestsHistory)
-        
-        DispatchQueue.main.async {
-            self.searchRequestsHistoryTableView.reloadData()
-        }
+        searchRequestsHistoryTableView.reloadData()
     }
     
     /// Clears search requests history from data source.
-    func didClearedSearchRequestsHistory() {
+    func didClearSearchRequestsHistory() {
         searchRequestsTableViewDataSource.clearData()
-        
-        DispatchQueue.main.async {
-            self.searchRequestsHistoryTableView.reloadData()
+        searchRequestsHistoryTableView.reloadData()
+    }
+    
+    /// Changes filter icon in search bar
+    ///
+    /// - Parameter flag: Defines whether to set filled or not icon.
+    func changeFilterIcon(by flag: Bool) {
+        UIView.animate(withDuration: 0.6, delay: 0.0, options: [.transitionCurlUp, .allowUserInteraction]) {
+            if flag {
+                self.searchController.searchBar.setImage(Images.Search.filterFill, for: .bookmark, state: .normal)
+            } else {
+                self.searchController.searchBar.setImage(Images.Search.filter, for: .bookmark, state: .normal)
+            }
         }
     }
 }
@@ -289,7 +308,6 @@ extension SearchViewController: UISearchBarDelegate {
               let keyword = searchBar.text, !keyword.isEmpty else { return }
         
         presenter.requestData(by: keyword)
-        presenter.fetchSearchRequestsHistory()
         handleViewOnSearching()
     }
     
@@ -304,7 +322,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
 }
 
-// MARK: - Collection View
+// MARK: - Pagination
 
 extension SearchViewController {
     
@@ -316,17 +334,9 @@ extension SearchViewController {
         if (recipesCollectionView.contentSize.height != 0 &&
             categoriesTableViewDataSource.isEmpty() &&
             scrollView.contentOffset.y >= (scrollView.contentSize.height - scrollView.bounds.size.height)) {
-            
-            /// Fetcing should not be in progress and there should be valid next page url.
-            guard !isFetchingInProgress,
-                  let nextPageUrl = nextPageUrl else { return }
-            
-            isFetchingInProgress = true
-            presenter.requestData(urlString: nextPageUrl)
+            presenter.requestData()
         }
     }
-    
-    // MARK: Footer
     
     override func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
         switch elementKind {
@@ -335,7 +345,7 @@ extension SearchViewController {
                 fatalError("Could not cast to `LoadingCollectionViewFooter` for indexPath \(indexPath) in willDisplaySupplementaryView")
             }
             /// If there is link to the next page and there is no categories start loading.
-            if nextPageUrl != nil && categoriesTableViewDataSource.isEmpty() {
+            if presenter.willRequestDataForPagination() && categoriesTableViewDataSource.isEmpty() {
                 footer.startActivityIndicator()
             }
         default:
@@ -381,6 +391,14 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
 
 extension SearchViewController: FilterDelegateProtocol {
     
+    /// Provides selected filters from `FilterViewController` to presenter.
+    ///
+    /// - Parameter data: Selected filters.
+    func provideSelectedFilters(data: [[FilterProtocol]]) {
+        guard let presenter = presenter as? SearchViewOutput else { return }
+        presenter.provideSelectedFilters(data: data)
+        presenter.defineWhetherFilteringIsOn()
+    }
 }
 
 extension SearchViewController {
