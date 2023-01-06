@@ -226,6 +226,7 @@ final class SearchViewController: BaseRecipesViewController {
         ])
     }
     
+    /// Adds history table view to the view.
     private func showHistoryTableView() {
         view.addSubview(searchRequestsHistoryTableView)
         
@@ -240,6 +241,7 @@ final class SearchViewController: BaseRecipesViewController {
         }
     }
     
+    /// Removes history table view from the view.
     private func hideHistoryTableView() {
         UIView.animate(withDuration: 0.4, delay: 0.0, options: [.allowUserInteraction, .curveEaseOut]) {
             self.searchRequestsHistoryTableView.alpha = 0
@@ -267,6 +269,9 @@ extension SearchViewController: SearchViewInput {
         searchRequestsHistoryTableView.reloadData()
     }
     
+    /// Changes filter icon in search bar
+    ///
+    /// - Parameter flag: Defines whether to set filled or not icon.
     func changeFilterIcon(by flag: Bool) {
         UIView.animate(withDuration: 0.6, delay: 0.0, options: [.transitionCurlUp, .allowUserInteraction]) {
             if flag {
@@ -317,7 +322,7 @@ extension SearchViewController: UISearchBarDelegate {
     }
 }
 
-// MARK: - Collection View
+// MARK: - Pagination
 
 extension SearchViewController {
     
@@ -332,8 +337,6 @@ extension SearchViewController {
             presenter.requestData()
         }
     }
-    
-    // MARK: Footer
     
     override func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
         switch elementKind {
@@ -387,6 +390,10 @@ extension SearchViewController: SearchCategoriesTableViewDataSourceDelegate, Sea
 // MARK: - FilterDelegateProtocol
 
 extension SearchViewController: FilterDelegateProtocol {
+    
+    /// Provides selected filters from `FilterViewController` to presenter.
+    ///
+    /// - Parameter data: Selected filters.
     func provideSelectedFilters(data: [[FilterProtocol]]) {
         guard let presenter = presenter as? SearchViewOutput else { return }
         presenter.provideSelectedFilters(data: data)

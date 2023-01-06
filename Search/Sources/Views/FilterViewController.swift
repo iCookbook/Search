@@ -97,6 +97,7 @@ final class FilterViewController: UIViewController {
         dismiss(animated: true)
     }
     
+    /// Turns indicators on on each filter defines in UserDefaults.
     private func selectOnFilters() {
         UserDefaults.dietsFilters.forEach { diet in
             let index = data[Filters.diet.rawValue].firstIndex {

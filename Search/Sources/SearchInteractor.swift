@@ -77,6 +77,9 @@ extension SearchInteractor: SearchInteractorInput {
         }
     }
     
+    /// Sets new filters to UserDefaults.
+    ///
+    /// - Parameter data: Filters to save in UD.
     func turnOnSelectedFilters(data: [[FilterProtocol]]) {
         UserDefaults.dietsFilters = data[Filters.diet.rawValue] as? [Diet] ?? []
         UserDefaults.cuisinesFilters = data[Filters.cuisine.rawValue] as? [Cuisine] ?? []
@@ -84,6 +87,7 @@ extension SearchInteractor: SearchInteractorInput {
         UserDefaults.mealsFilters = data[Filters.meal.rawValue] as? [Meal] ?? []
     }
     
+    /// Defines whether filtering is on or not.
     func isFilteringOn() {
         let result = !UserDefaults.dietsFilters.isEmpty ||
                      !UserDefaults.mealsFilters.isEmpty ||
@@ -98,6 +102,9 @@ extension SearchInteractor: SearchInteractorInput {
 // MARK: - Helper methods
 
 extension SearchInteractor {
+    /**
+     Methods below convert provided `data` (filters) into query items for server request.
+     */
     func convertCuisineFilters(from data: [Cuisine]) -> [(String, String)] {
         data.map { ("cuisineType", $0.rawValue) }
     }
