@@ -6,7 +6,7 @@
 //  
 
 import UIKit
-import Networking
+import Common
 
 public final class SearchAssembly {
     
@@ -21,9 +21,9 @@ public final class SearchAssembly {
     
     // MARK: - Public Methods
     
-    public static func assemble(with context: SearchContext) -> SearchAssembly {
+    public static func assemble(with context: BaseRecipesDependenciesProtocol) -> SearchAssembly {
         let router = SearchRouter()
-        let interactor = SearchInteractor(networkManager: context.moduleDependency)
+        let interactor = SearchInteractor(networkManager: context.networkManager)
         let presenter = SearchPresenter(router: router, interactor: interactor)
         let viewController = SearchViewController(presenter: presenter)
         
@@ -42,15 +42,5 @@ public final class SearchAssembly {
         self.viewController = view
         self.input = input
         self.router = router
-    }
-}
-
-public struct SearchContext {
-    weak var moduleOutput: SearchModuleOutput?
-    let moduleDependency: NetworkManagerProtocol
-    
-    public init(moduleOutput: SearchModuleOutput? = nil, moduleDependency: NetworkManagerProtocol) {
-        self.moduleOutput = moduleOutput
-        self.moduleDependency = moduleDependency
     }
 }
